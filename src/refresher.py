@@ -1,5 +1,4 @@
 import requests
-import json
 import pandas as pd
 from src.CONSTANS import MAIN_API
 
@@ -18,9 +17,9 @@ class Refresher:
     def update_players(self):
         api_result = self.api_call(MAIN_API)
         df_players = pd.json_normalize(api_result['elements'])
-        return df_players 
+        return df_players
 
     def update_teams(self):
         api_result = self.api_call(MAIN_API)
         df_teams = pd.json_normalize(api_result['teams'])
-        return df_teams 
+        return df_teams
