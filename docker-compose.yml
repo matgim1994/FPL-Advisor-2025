@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:17
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${FPL_PG_USER}
+      POSTGRES_PASSWORD: ${FPL_PG_PASS}
+      POSTGRES_DB: ${FPL_PG_DB}
+    ports:
+      - "7651:5432"
+    volumes:
+      - fpl-data:/var/lib/postgresql/data
+
+volumes:
+  fpl-data:
+    external: true
