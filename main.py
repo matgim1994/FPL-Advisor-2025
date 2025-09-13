@@ -1,7 +1,16 @@
-from src.refresher import Refresher
+import os
 
-refresher = Refresher()
-events = refresher.update_events()
-print(events.shape)
-players = refresher.update_players()
-print(players.shape)
+from src.db_handlers.db_handler import DBHandler
+from src.models.pg_config import PGConfig
+from dotenv import load_dotenv
+
+load_dotenv()
+pgconfig = PGConfig(
+    host=os.getenv("FPL_PG_HOST"),
+    dbname=os.getenv("FPL_PG_DB"),
+    user=os.getenv("FPL_PG_USER"),
+    password=os.getenv("FPL_PG_PASS"),
+    port=os.getenv("FPL_PG_PORT")
+)
+dbhandler = DBHandler(pgconfig=pgconfig)
+dbhandler.setup_connection()

@@ -1,3 +1,5 @@
 MAIN_API = 'https://fantasy.premierleague.com/api/bootstrap-static/'
 PLAYER_API = 'https://fantasy.premierleague.com/api/element-summary/'
 MANAGER_API = 'https://fantasy.premierleague.com/api/entry/'
+LOGS_FOLDER_NAME = 'logs/'
+REFRESHER_LOGS_FOLDER_NAME = 'refresher/'
