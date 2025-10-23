@@ -13,5 +13,6 @@ pgconfig = PGConfig(
     port=os.getenv("FPL_PG_PORT")
 )
 dbhandler = DBHandler(pgconfig=pgconfig)
-df_events = dbhandler.update_events()
-print(df_events.dtypes)
+dbhandler.update_teams()
+dbhandler.update_elements()
+dbhandler.update_events()

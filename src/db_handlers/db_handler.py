@@ -1,14 +1,20 @@
 import psycopg2
 import requests
-import pandas as pd
-
+import json
+from datetime import datetime, timezone
 from src.models.pg_config import PGConfig
+from src.models.event import Event
+from src.models.element import Element
+from src.models.team import Team
+from src.logger import get_logger, setup_dbhandler_logger
 from src.CONSTANS import MAIN_API
 
 
 class DBHandler:
 
     def __init__(self, pgconfig: PGConfig):
+        setup_dbhandler_logger()
+        self._logger = get_logger(logger_name='db_handler')
         self._pg_config = pgconfig
         self._pg_conn = self._setup_connection()
 
@@ -29,12 +35,131 @@ class DBHandler:
             api (str): api URL
 
         Returns:
-            list[dict]: api result"""
+            list[dict]: api result
 
-        api_result = requests.get(api).json()
-        return api_result
+        Raises:
+            Exception: in case of an error during api call"""
 
-    def update_events(self):
+        try:
+            self._logger.info('Starting API call...')
+            api_result = requests.get(api).json()
+            self._logger.info('API call returned corectly.')
+            return api_result
+        except Exception as e:
+            self._logger.error(f'Error occured during api call: {e}. Raising error.')
+            raise e
+
+    def _serialize_arrays(self, record: dict) -> list:
+        """Function seralizes dicts and lists before making an insert on database.
+
+        Args:
+            record (dict): one record mented to be written to db.
+
+        Returns:
+            record (dict): record with serialized values."""
+
+        for key, value in record.items():
+            if isinstance(value, (dict, list)):
+                record[key] = json.dumps(value)
+
+        return record
+
+    def update_events(self) -> None:
+        """Function updates the raw data for raw.events table.
+
+        Raises:
+            Exception: when data from API does not match Events model requirements."""
+
+        self._logger.info('raw.events table update starting...')
+        columns = list(Event.model_fields.keys())
         api_result = self.api_call(MAIN_API)
-        df_events = pd.json_normalize(api_result['events'])
-        return df_events
+
+        try:
+            self._logger.info('Validating events fields returned by API...')
+            events = [Event.model_validate(event) for event in api_result['events']]
+            self._logger.info('Events fields are correct.')
+        except Exception as e:
+            self._logger.error(f'An error occured during events fields validation: {e}. Raising error.')
+            self._pg_conn.close()
+            raise e
+
+        self._upload_raw_data(schema='raw', table_name='events', records=events, columns=columns)
+
+    def update_elements(self):
+        """Function updates the raw data for raw.elements table.
+
+        Raises:
+            Exception: when data from API does not match Element model requirements."""
+
+        self._logger.info('raw.elements table update starting...')
+        columns = list(Element.model_fields.keys())
+        api_result = self.api_call(MAIN_API)
+
+        try:
+            self._logger.info('Validating elements fields returned by API...')
+            elements = [Element.model_validate(element) for element in api_result['elements']]
+            self._logger.info('Elements fields are correct.')
+        except Exception as e:
+            self._logger.error(f'An error occured during elements fields validation: {e}. Raising error.')
+            self._pg_conn.close()
+            raise e
+
+        self._upload_raw_data(schema='raw', table_name='elements', records=elements, columns=columns)
+
+    def update_teams(self):
+        """Function updates the raw data for raw.teams table.
+
+        Raises:
+            Exception: when data from API does not match Team model requirements."""
+
+        self._logger.info('raw.teams table update starting...')
+        columns = list(Team.model_fields.keys())
+        api_result = self.api_call(MAIN_API)
+
+        try:
+            self._logger.info('Validating teams fields returned by API...')
+            teams = [Team.model_validate(element) for element in api_result['teams']]
+            self._logger.info('Teams fields are correct.')
+        except Exception as e:
+            self._logger.error(f'An error occured during teams fields validation: {e}. Raising error.')
+            self._pg_conn.close()
+            raise e
+
+        self._upload_raw_data(schema='raw', table_name='teams', records=teams, columns=columns)
+
+    def _upload_raw_data(self, schema: str, table_name: str, records: list, columns: list) -> None:
+        """Function uploads raw data from API to given table in given schema.
+
+        Args:
+            schema (str): destination table schema
+            table_name (str): destination table name
+            records (list): list of dicts where single dict is a single record
+            columns (list): list of columns in the destination table
+
+        Raises:
+            Exception: when there is an issue during data upload
+        """
+
+        ingestion_time = datetime.now(timezone.utc)
+        try:
+            self._logger.info(f'Starting data ingestion to {schema}.{table_name} table...')
+            bind_values = []
+            for record in records:
+                record.ingestion_time = ingestion_time
+                event_dict = record.model_dump()
+                values = [json.dumps(event_dict[c]) if isinstance(event_dict[c], (dict, list))
+                          else event_dict[c] for c in columns]
+                values_tuple = tuple(values)
+                bind_values.append(values_tuple)
+
+            columns_str = ', '.join(f'"{c}"' for c in columns)
+            placeholders = ', '.join(['%s'] * len(columns))
+            sql_insert = f"""insert into {schema}.{table_name}({columns_str}) values({placeholders})"""
+            with self._pg_conn.cursor() as cursor:
+                cursor.executemany(sql_insert, bind_values)
+                self._pg_conn.commit()
+            self._logger.info(f'Data ingested to {schema}.{table_name} table successfully.')
+        except Exception as e:
+            self._logger.info(f'An error occured during data ingestion to {schema}.{table_name}: {e}. Raising error.')
+            self._pg_conn.close()
+            raise e

@@ -4,7 +4,7 @@ import os
 import sys
 import logging
 from src.CONSTANS import (
-    LOGS_FOLDER_NAME, REFRESHER_LOGS_FOLDER_NAME
+    LOGS_FOLDER_NAME, DBHANDLER_LOGS_FOLDER_NAME
 )
 
 
@@ -33,27 +33,23 @@ class TimezoneFormatter(logging.Formatter):
             return record_time.isoformat()
 
 
-def setup_refresher_logger(table_name: str) -> None:
-    """Method used to setup refresher logger.
-    Logger for given table_name will be refresher logger.
+def setup_dbhandler_logger() -> None:
+    """Method used to setup dbhandler logger."""
+
+    logs_folder_path = os.path.join(LOGS_FOLDER_NAME, DBHANDLER_LOGS_FOLDER_NAME)
+    _setup_logger(logger_name='db_handler', logs_folder_path=logs_folder_path)
+
+
+def get_logger(logger_name: str) -> logging.Logger:
+    """Method used to return logger object.
 
     Args:
-        table_name (str): name of a table beeing refreshed
-    """
-    logs_folder_path = os.path.join(LOGS_FOLDER_NAME, REFRESHER_LOGS_FOLDER_NAME)
-    _setup_logger(logger_name=table_name, logs_folder_path=logs_folder_path)
-
-
-def get_logger(table_name: str) -> logging.Logger:
-    """Method used to return logger for given table_name.
-
-    Args:
-        table_name (str): name of table for which logger has to be retrived
+        logger_name (str): logger name to be retrived
 
     Returns:
-        logging.Logger: logger for given table
+        logging.Logger: logger object
     """
-    return logging.getLogger(table_name)
+    return logging.getLogger(logger_name)
 
 
 def _setup_logger(logger_name: str, logs_folder_path: str) -> None:
@@ -61,14 +57,14 @@ def _setup_logger(logger_name: str, logs_folder_path: str) -> None:
     Each logger get by get_logger functin will be setup.
 
     Args:
-        table_name (str): name of a table
+        logger_name (str): name of a logger
         logs_folder_path (str): path to folder in which logs are to be stored
     """
 
     log_filename = f"{logger_name}" + ".log"
 
     log_path = os.path.join(logs_folder_path, log_filename)
-    logger = get_logger(table_name=logger_name)
+    logger = get_logger(logger_name=logger_name)
 
     FORMAT = "[ %(asctime)s ] [ %(levelname)s ] %(message)s"
     logger.setLevel(logging.INFO)
