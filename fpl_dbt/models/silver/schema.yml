@@ -1,0 +1,55 @@
+models:
+  - name: teams
+    description: "Cleared teams data."
+    constraints:
+      - type: primary_key
+        columns: [id]
+        warn_unsupported: true
+
+  - name: goalkeepers
+    description: "Cleaned players data, reduced only to goalkeepers."
+    constraints:
+      - type: primary_key
+        columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [team]
+        to: ref('teams')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: defenders
+    description: "Cleaned players data, reduced only to defenders."
+    constraints:
+      - type: primary_key
+        columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [team]
+        to: ref('teams')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: midfielders
+    description: "Cleaned players data, reduced only to midfielders."
+    constraints:
+      - type: primary_key
+        columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [team]
+        to: ref('teams')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: forwards
+    description: "Cleaned players data, reduced only to forwards."
+    constraints:
+      - type: primary_key
+        columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [team]
+        to: ref('teams')
+        to_columns: [id]
+        warn_unsupported: true

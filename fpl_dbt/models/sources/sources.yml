@@ -1,0 +1,9 @@
+sources:
+  - name: raw
+    tables:
+      - name: elements
+        description: "Raw players data."
+      - name: events
+        description: "Raw data on each gameweek."
+      - name: teams
+        description: "Raw teams data."
