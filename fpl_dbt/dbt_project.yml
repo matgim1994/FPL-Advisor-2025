@@ -32,5 +32,9 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   fpl_dbt:
     # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    bronze:
+      +schema: bronze
+    silver:
+      +schema: silver
+    gold:
+      +schema: gold
