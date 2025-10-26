@@ -2,7 +2,8 @@
     config(
         materialized='incremental',
         incremental_strategy='merge',
-        unique_key='id'
+        unique_key='id',
+        alias='midfielders'
     ) 
 }}
 
@@ -93,13 +94,9 @@ with source_data as (
         starts_per_90,
         clean_sheets_per_90,
         defensive_contribution_per_90
-    from {{ source('raw', 'elements') }}
+    from {{ ref('bronze_elements') }}
     where can_select is True
-    and element_type = 2
-
-    {% if is_incremental() %}
-        and ingestion_time = (select max(ingestion_time) from {{ source('raw', 'elements') }})
-    {% endif %}
+    and element_type = 3
 )
 
 select *

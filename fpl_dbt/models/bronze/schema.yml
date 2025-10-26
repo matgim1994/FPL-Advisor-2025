@@ -1,0 +1,51 @@
+models:
+  - name: bronze_teams
+    description: "Latest raw teams data."
+    constraints:
+      - type: primary_key
+        columns: [id]
+        warn_unsupported: true
+
+  - name: bronze_elements
+    description: "Latest raw players data."
+    constraints:
+      - type: primary_key
+        columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [team]
+        to: ref('bronze_teams')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: bronze_events
+    description: "Latest raw events data."
+    constraints:
+      - type: primary_key
+        columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [most_selected]
+        to: ref('bronze_elements')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [most_transferred_in]
+        to: ref('bronze_elements')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [top_element]
+        to: ref('bronze_elements')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [most_captained]
+        to: ref('bronze_elements')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [most_vice_captained]
+        to: ref('bronze_elements')
+        to_columns: [id]
+        warn_unsupported: true

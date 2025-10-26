@@ -1,7 +1,8 @@
 {{ config(
     materialized='incremental',
     incremental_strategy='merge',
-    unique_key='id'
+    unique_key='id',
+    alias='teams'
 ) }}
 
 with source_data as (
@@ -19,10 +20,7 @@ with source_data as (
         strength_defence_home,
         strength_defence_away,
         pulse_id
-    from {{ source('raw', 'teams') }}
-    {% if is_incremental() %}
-      where ingestion_time = (select max(ingestion_time) from {{ source('raw', 'elements') }})
-    {% endif %}
+    from {{ ref('bronze_teams') }}
 )
 
 select *
