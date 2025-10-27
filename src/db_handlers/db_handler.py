@@ -6,8 +6,9 @@ from src.models.pg_config import PGConfig
 from src.models.event import Event
 from src.models.element import Element
 from src.models.team import Team
+from src.models.fixture import Fixture
 from src.logger import get_logger, setup_dbhandler_logger
-from src.CONSTANS import MAIN_API
+from src.CONSTANS import MAIN_API, FIXTURES_API
 
 
 class DBHandler:
@@ -126,6 +127,27 @@ class DBHandler:
             raise e
 
         self._upload_raw_data(schema='raw', table_name='teams', records=teams, columns=columns)
+
+    def update_fixtures(self):
+        """Function updates the raw data for raw.fixtures table.
+
+        Raises:
+            Exception: when data from API does not match Fixture model requirements."""
+
+        self._logger.info('raw.fixtures table update starting...')
+        columns = list(Fixture.model_fields.keys())
+        api_result = self.api_call(FIXTURES_API)
+
+        try:
+            self._logger.info('Validating fixtures fields returned by API...')
+            fixtures = [Fixture.model_validate(element) for element in api_result]
+            self._logger.info('Teams fields are correct.')
+        except Exception as e:
+            self._logger.error(f'An error occured during teams fields validation: {e}. Raising error.')
+            self._pg_conn.close()
+            raise e
+
+        self._upload_raw_data(schema='raw', table_name='fixtures', records=fixtures, columns=columns)
 
     def _upload_raw_data(self, schema: str, table_name: str, records: list, columns: list) -> None:
         """Function uploads raw data from API to given table in given schema.
