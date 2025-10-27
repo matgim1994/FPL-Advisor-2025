@@ -1,5 +1,6 @@
 MAIN_API = 'https://fantasy.premierleague.com/api/bootstrap-static/'
 PLAYER_API = 'https://fantasy.premierleague.com/api/element-summary/'
 MANAGER_API = 'https://fantasy.premierleague.com/api/entry/'
+FIXTURES_API = 'https://fantasy.premierleague.com/api/fixtures/'
 LOGS_FOLDER_NAME = 'logs/'
 DBHANDLER_LOGS_FOLDER_NAME = 'dbhandler/'
