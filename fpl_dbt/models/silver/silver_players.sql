@@ -3,7 +3,7 @@
         materialized='incremental',
         incremental_strategy='merge',
         unique_key='id',
-        alias='defenders'
+        alias='players'
     ) 
 }}
 
@@ -96,7 +96,6 @@ with source_data as (
         defensive_contribution_per_90
     from {{ ref('bronze_elements') }}
     where can_select is True
-    and element_type = 2
 )
 
 select *
