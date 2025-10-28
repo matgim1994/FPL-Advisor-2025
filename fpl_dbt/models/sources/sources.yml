@@ -7,3 +7,5 @@ sources:
         description: "Raw data on each gameweek."
       - name: teams
         description: "Raw teams data."
+      - name: fixtures
+        description: "Raw fixtures data."
