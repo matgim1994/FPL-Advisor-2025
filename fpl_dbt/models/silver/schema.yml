@@ -170,3 +170,255 @@ models:
         to: ref('silver_players')
         to_columns: [id]
         warn_unsupported: true
+
+  - name: silver_owngoalscorers_away
+    description: "Own goalscorers from away team per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_owngoalscorers_home
+    description: "Own goalscorers from home team per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_penalty_save_away
+    description: "Penalty savers from away team per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_penalty_save_home
+    description: "Penalty savers from home team per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_penalty_missed_away
+    description: "Players from away team who missed penalty per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_penalty_missed_home
+    description: "Players from home team who missed penalty per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_yellow_cards_away
+    description: "Players from away team who saw yellow card per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_yellow_cards_home
+    description: "Players from home team who saw yellow card per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_red_cards_away
+    description: "Players from away team who saw red card per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_red_cards_home
+    description: "Players from home team who saw red card per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_saves_away
+    description: "Number of saves per player from away per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_saves_home
+    description: "Number of saves per player from home per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_bonus_away
+    description: "Players from away team who obtained bonus points per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_bonus_home
+    description: "Players from home team who obtained bonus points per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_bps_away
+    description: "Players from away team bps per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_bps_home
+    description: "Players from home team bps per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_dc_away
+    description: "Players from away team defensive contributions per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: silver_dc_home
+    description: "Players from home team defensive contributions per fixture"
+    constraints:
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
