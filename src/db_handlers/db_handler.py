@@ -7,8 +7,9 @@ from src.models.event import Event
 from src.models.element import Element
 from src.models.team import Team
 from src.models.fixture import Fixture
+from src.models.player_history import PlayerHistory
 from src.logger import get_logger, setup_dbhandler_logger
-from src.CONSTANS import MAIN_API, FIXTURES_API
+from src.CONSTANS import MAIN_API, FIXTURES_API, PLAYER_API
 
 
 class DBHandler:
@@ -48,6 +49,25 @@ class DBHandler:
             return api_result
         except Exception as e:
             self._logger.error(f'Error occured during api call: {e}. Raising error.')
+            self._pg_conn.close()
+            raise e
+
+    def api_session(self) -> requests.sessions.Session:
+        """Function creates api session.
+
+        Returns:
+            session(requests.sessions.Session): api session
+        Raises:
+            Exception: when there is an error with session creation."""
+
+        try:
+            self._logger.info('Creating API session.')
+            session = requests.Session()
+            session.headers.update({'User-Agent': 'FPL2025'})
+            return session
+        except Exception as e:
+            self._logger.error(f'Error occured during api session creation: {e}. Raising error.')
+            self._pg_conn.close()
             raise e
 
     def _serialize_arrays(self, record: dict) -> list:
@@ -149,6 +169,32 @@ class DBHandler:
 
         self._upload_raw_data(schema='raw', table_name='fixtures', records=fixtures, columns=columns)
 
+    def update_players_history(self):
+        """Function updates the raw data for raw.players_history table.
+
+        Raises:
+            Exception: when data from API does not match PlayersHistory model requirements."""
+
+        self._logger.info('raw.players_history table update starting...')
+        columns = list(PlayerHistory.model_fields.keys())
+        players_ids = self._get_players_ids()
+        api_session = self.api_session()
+
+        for player_id in players_ids:
+            api_result = api_session.get(PLAYER_API + str(player_id)).json()
+            api_result = api_result['history']
+
+            try:
+                self._logger.info(f'Validating player {player_id} history fields returned by API...')
+                history = [PlayerHistory.model_validate(element) for element in api_result]
+                self._logger.info(f'Players {player_id} history fields are correct.')
+            except Exception as e:
+                self._logger.error(f'An error occured during player {player_id} fields validation: {e}. Raising error.')
+                self._pg_conn.close()
+                raise e
+
+            self._upload_raw_data(schema='raw', table_name='players_history', records=history, columns=columns)
+
     def _upload_raw_data(self, schema: str, table_name: str, records: list, columns: list) -> None:
         """Function uploads raw data from API to given table in given schema.
 
@@ -183,5 +229,32 @@ class DBHandler:
             self._logger.info(f'Data ingested to {schema}.{table_name} table successfully.')
         except Exception as e:
             self._logger.info(f'An error occured during data ingestion to {schema}.{table_name}: {e}. Raising error.')
+            self._pg_conn.close()
+            raise e
+
+    def _get_players_ids(self) -> list[int]:
+        """Function returns latests players ids.
+
+        Returns:
+            players_ids(list[int]): players ids in ascending order
+        Raises:
+            Exception: when there is an issue with selecting the data."""
+
+        try:
+            self._logger.info('Selecting most up to date list of players ids...')
+            sql_select = """select id from raw.elements
+                            where ingestion_time =
+                                (select max(ingestion_time)
+                                from raw.elements)
+                            order by id asc"""
+            with self._pg_conn.cursor() as cursor:
+                cursor.execute(sql_select)
+                players_ids = [result[0] for result in cursor.fetchall()]
+            if len(players_ids) < 746:
+                self._logger.warning("Number of players is lower that 746 (starting ammount). "
+                                     "If necessary check latest players list.")
+            return players_ids
+        except Exception as e:
+            self._logger.info(f'An error occured during selecting player ids: {e}. Raising error.')
             self._pg_conn.close()
             raise e
