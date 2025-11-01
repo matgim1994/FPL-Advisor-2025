@@ -422,3 +422,32 @@ models:
         to: ref('silver_players')
         to_columns: [id]
         warn_unsupported: true
+
+  - name: silver_players_history
+    description: "Cleaned players history data."
+    constraints:
+      - type: foreign_key
+        columns: [element]
+        to: ref('bronze_elements')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('bronze_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [opponent_team]
+        to: ref('bronze_teams')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [opponent_team]
+        to: ref('bronze_teams')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [round]
+        to: ref('bronze_events')
+        to_columns: [id]
+        warn_unsupported: true

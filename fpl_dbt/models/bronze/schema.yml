@@ -49,6 +49,7 @@ models:
         to: ref('bronze_elements')
         to_columns: [id]
         warn_unsupported: true
+  
   - name: bronze_fixtures
     description: "Latest fixtures data."
     constraints:
@@ -68,5 +69,34 @@ models:
       - type: foreign_key
         columns: [team_h]
         to: ref('bronze_teams')
+        to_columns: [id]
+        warn_unsupported: true
+
+  - name: bronze_players_history
+    description: "Latests players history data."
+    constraints:
+      - type: foreign_key
+        columns: [element]
+        to: ref('bronze_elements')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('bronze_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [opponent_team]
+        to: ref('bronze_teams')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [opponent_team]
+        to: ref('bronze_teams')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [round]
+        to: ref('bronze_events')
         to_columns: [id]
         warn_unsupported: true
