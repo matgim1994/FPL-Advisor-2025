@@ -8,6 +8,7 @@ from src.models.element import Element
 from src.models.team import Team
 from src.models.fixture import Fixture
 from src.models.player_history import PlayerHistory
+from src.models.player_upcoming_fixtures import PlayerFixtures
 from src.logger import get_logger, setup_dbhandler_logger
 from src.CONSTANS import MAIN_API, FIXTURES_API, PLAYER_API
 
@@ -189,11 +190,40 @@ class DBHandler:
                 history = [PlayerHistory.model_validate(element) for element in api_result]
                 self._logger.info(f'Players {player_id} history fields are correct.')
             except Exception as e:
-                self._logger.error(f'An error occured during player {player_id} fields validation: {e}. Raising error.')
+                self._logger.error(f'An error occured during player {player_id} ' +
+                                   f'history fields validation: {e}. Raising error.')
                 self._pg_conn.close()
                 raise e
 
             self._upload_raw_data(schema='raw', table_name='players_history', records=history, columns=columns)
+
+    def update_players_fixtures(self):
+        """Function updates the raw data for raw.players_upcoming_fixtures table.
+
+        Raises:
+            Exception: when data from API does not match PlayersHistory model requirements."""
+
+        self._logger.info('raw.players_upcoming_fixtures table update starting...')
+        columns = list(PlayerFixtures.model_fields.keys())
+        players_ids = self._get_players_ids()
+        api_session = self.api_session()
+
+        for player_id in players_ids:
+            api_result = api_session.get(PLAYER_API + str(player_id)).json()
+            api_result = api_result['fixtures']
+
+            try:
+                self._logger.info(f'Validating player {player_id} upcoming fixtures fields returned by API...')
+                player_fixtures = [PlayerFixtures.model_validate(element) for element in api_result]
+                self._logger.info(f'Players {player_id} upcoming fixtures fields are correct.')
+            except Exception as e:
+                self._logger.error(f'An error occured during player {player_id} ' +
+                                   f'upcoming fixtures fields validation: {e}. Raising error.')
+                self._pg_conn.close()
+                raise e
+
+            self._upload_raw_data(schema='raw', table_name='players_fixtures',
+                                  records=player_fixtures, columns=columns)
 
     def _upload_raw_data(self, schema: str, table_name: str, records: list, columns: list) -> None:
         """Function uploads raw data from API to given table in given schema.
