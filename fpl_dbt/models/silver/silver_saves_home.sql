@@ -2,7 +2,7 @@
     materialized='incremental',
     incremental_strategy='merge',
     unique_key=['fixture', 'element'],
-    alias='saves_home'
+    alias='fixtures_saves_home'
 ) }}
 
 with source_data as (

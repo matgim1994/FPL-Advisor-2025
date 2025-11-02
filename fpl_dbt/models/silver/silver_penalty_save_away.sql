@@ -2,7 +2,7 @@
     materialized='incremental',
     incremental_strategy='merge',
     unique_key=['fixture', 'element'],
-    alias='penalty_save_away'
+    alias='fixtures_penalty_save_away'
 ) }}
 
 with source_data as (

@@ -2,7 +2,7 @@
     materialized='incremental',
     incremental_strategy='merge',
     unique_key=['fixture', 'element'],
-    alias='owngoalscorers_home'
+    alias='fixtures_owngoalscorers_home'
 ) }}
 
 with source_data as (
