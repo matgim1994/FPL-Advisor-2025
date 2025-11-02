@@ -9,3 +9,7 @@ sources:
         description: "Raw teams data."
       - name: fixtures
         description: "Raw fixtures data."
+      - name: players_history
+        description: "Raw players history data."
+      - name: players_fixtures
+        description: "Raw players fixtures data."

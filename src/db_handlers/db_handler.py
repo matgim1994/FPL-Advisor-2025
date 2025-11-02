@@ -8,6 +8,7 @@ from src.models.element import Element
 from src.models.team import Team
 from src.models.fixture import Fixture
 from src.models.player_history import PlayerHistory
+from src.models.player_upcoming_fixtures import PlayerFixtures
 from src.logger import get_logger, setup_dbhandler_logger
 from src.CONSTANS import MAIN_API, FIXTURES_API, PLAYER_API
 
@@ -30,7 +31,7 @@ class DBHandler:
         )
         return conn
 
-    def api_call(self, api: str):
+    def _api_call(self, api: str):
         """Function makes an api call to given url.
 
         Args:
@@ -52,7 +53,7 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-    def api_session(self) -> requests.sessions.Session:
+    def _api_session(self) -> requests.sessions.Session:
         """Function creates api session.
 
         Returns:
@@ -92,8 +93,9 @@ class DBHandler:
             Exception: when data from API does not match Events model requirements."""
 
         self._logger.info('raw.events table update starting...')
+        ingestion_time = datetime.now(timezone.utc)
         columns = list(Event.model_fields.keys())
-        api_result = self.api_call(MAIN_API)
+        api_result = self._api_call(MAIN_API)
 
         try:
             self._logger.info('Validating events fields returned by API...')
@@ -104,7 +106,8 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-        self._upload_raw_data(schema='raw', table_name='events', records=events, columns=columns)
+        self._upload_raw_data(schema='raw', table_name='events',
+                              records=events, columns=columns, ingestion_time=ingestion_time)
 
     def update_elements(self):
         """Function updates the raw data for raw.elements table.
@@ -113,8 +116,9 @@ class DBHandler:
             Exception: when data from API does not match Element model requirements."""
 
         self._logger.info('raw.elements table update starting...')
+        ingestion_time = datetime.now(timezone.utc)
         columns = list(Element.model_fields.keys())
-        api_result = self.api_call(MAIN_API)
+        api_result = self._api_call(MAIN_API)
 
         try:
             self._logger.info('Validating elements fields returned by API...')
@@ -125,7 +129,8 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-        self._upload_raw_data(schema='raw', table_name='elements', records=elements, columns=columns)
+        self._upload_raw_data(schema='raw', table_name='elements',
+                              records=elements, columns=columns, ingestion_time=ingestion_time)
 
     def update_teams(self):
         """Function updates the raw data for raw.teams table.
@@ -134,8 +139,9 @@ class DBHandler:
             Exception: when data from API does not match Team model requirements."""
 
         self._logger.info('raw.teams table update starting...')
+        ingestion_time = datetime.now(timezone.utc)
         columns = list(Team.model_fields.keys())
-        api_result = self.api_call(MAIN_API)
+        api_result = self._api_call(MAIN_API)
 
         try:
             self._logger.info('Validating teams fields returned by API...')
@@ -146,7 +152,8 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-        self._upload_raw_data(schema='raw', table_name='teams', records=teams, columns=columns)
+        self._upload_raw_data(schema='raw', table_name='teams',
+                              records=teams, columns=columns, ingestion_time=ingestion_time)
 
     def update_fixtures(self):
         """Function updates the raw data for raw.fixtures table.
@@ -155,8 +162,9 @@ class DBHandler:
             Exception: when data from API does not match Fixture model requirements."""
 
         self._logger.info('raw.fixtures table update starting...')
+        ingestion_time = datetime.now(timezone.utc)
         columns = list(Fixture.model_fields.keys())
-        api_result = self.api_call(FIXTURES_API)
+        api_result = self._api_call(FIXTURES_API)
 
         try:
             self._logger.info('Validating fixtures fields returned by API...')
@@ -167,7 +175,8 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-        self._upload_raw_data(schema='raw', table_name='fixtures', records=fixtures, columns=columns)
+        self._upload_raw_data(schema='raw', table_name='fixtures',
+                              records=fixtures, columns=columns, ingestion_time=ingestion_time)
 
     def update_players_history(self):
         """Function updates the raw data for raw.players_history table.
@@ -176,12 +185,13 @@ class DBHandler:
             Exception: when data from API does not match PlayersHistory model requirements."""
 
         self._logger.info('raw.players_history table update starting...')
+        ingestion_time = datetime.now(timezone.utc)
         columns = list(PlayerHistory.model_fields.keys())
         players_ids = self._get_players_ids()
-        api_session = self.api_session()
+        _api_session = self._api_session()
 
         for player_id in players_ids:
-            api_result = api_session.get(PLAYER_API + str(player_id)).json()
+            api_result = _api_session.get(PLAYER_API + str(player_id)).json()
             api_result = api_result['history']
 
             try:
@@ -189,13 +199,46 @@ class DBHandler:
                 history = [PlayerHistory.model_validate(element) for element in api_result]
                 self._logger.info(f'Players {player_id} history fields are correct.')
             except Exception as e:
-                self._logger.error(f'An error occured during player {player_id} fields validation: {e}. Raising error.')
+                self._logger.error(f'An error occured during player {player_id} ' +
+                                   f'history fields validation: {e}. Raising error.')
                 self._pg_conn.close()
                 raise e
 
-            self._upload_raw_data(schema='raw', table_name='players_history', records=history, columns=columns)
+            self._upload_raw_data(schema='raw', table_name='players_history',
+                                  records=history, columns=columns, ingestion_time=ingestion_time)
 
-    def _upload_raw_data(self, schema: str, table_name: str, records: list, columns: list) -> None:
+    def update_players_fixtures(self):
+        """Function updates the raw data for raw.players_upcoming_fixtures table.
+
+        Raises:
+            Exception: when data from API does not match PlayersHistory model requirements."""
+
+        self._logger.info('raw.players_upcoming_fixtures table update starting...')
+        ingestion_time = datetime.now(timezone.utc)
+        columns = list(PlayerFixtures.model_fields.keys())
+        players_ids = self._get_players_ids()
+        _api_session = self._api_session()
+
+        for player_id in players_ids:
+            api_result = _api_session.get(PLAYER_API + str(player_id)).json()
+            api_result = api_result['fixtures']
+            for fixture in api_result:
+                fixture['element'] = player_id
+
+            try:
+                self._logger.info(f'Validating player {player_id} upcoming fixtures fields returned by API...')
+                player_fixtures = [PlayerFixtures.model_validate(element) for element in api_result]
+                self._logger.info(f'Players {player_id} upcoming fixtures fields are correct.')
+            except Exception as e:
+                self._logger.error(f'An error occured during player {player_id} ' +
+                                   f'upcoming fixtures fields validation: {e}. Raising error.')
+                self._pg_conn.close()
+                raise e
+
+            self._upload_raw_data(schema='raw', table_name='players_fixtures',
+                                  records=player_fixtures, columns=columns, ingestion_time=ingestion_time)
+
+    def _upload_raw_data(self, schema: str, table_name: str, records: list, columns: list, ingestion_time: datetime) -> None:
         """Function uploads raw data from API to given table in given schema.
 
         Args:
@@ -203,12 +246,12 @@ class DBHandler:
             table_name (str): destination table name
             records (list): list of dicts where single dict is a single record
             columns (list): list of columns in the destination table
+            ingestion_time(datetime): time of data ingestion
 
         Raises:
             Exception: when there is an issue during data upload
         """
 
-        ingestion_time = datetime.now(timezone.utc)
         try:
             self._logger.info(f'Starting data ingestion to {schema}.{table_name} table...')
             bind_values = []
