@@ -451,3 +451,32 @@ models:
         to: ref('bronze_events')
         to_columns: [id]
         warn_unsupported: true
+
+  - name: silver_players_fixtures
+    description: "Cleaned and indexed players fixtures data."
+    constraints:
+      - type: foreign_key
+        columns: [element]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [id]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [team_h]
+        to: ref('silver_teams')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [team_a]
+        to: ref('silver_teams')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [event]
+        to: ref('silver_events')
+        to_columns: [id]
+        warn_unsupported: true

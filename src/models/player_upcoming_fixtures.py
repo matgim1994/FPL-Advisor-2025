@@ -4,6 +4,7 @@ from typing import Optional
 
 
 class PlayerFixtures(BaseModel):
+    element: int
     id: int
     code: int
     team_h: int

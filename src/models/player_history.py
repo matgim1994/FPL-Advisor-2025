@@ -10,8 +10,8 @@ class PlayerHistory(BaseModel):
     total_points: int
     was_home: bool
     kickoff_time: datetime
-    team_h_score: int
-    team_a_score: int
+    team_h_score: Optional[int] = None
+    team_a_score: Optional[int] = None
     round: int
     modified: bool
     minutes: int
