@@ -9,8 +9,9 @@ from src.models.team import Team
 from src.models.fixture import Fixture
 from src.models.player_history import PlayerHistory
 from src.models.player_upcoming_fixtures import PlayerFixtures
+from src.models.points_explain import PointsExplain
 from src.logger import get_logger, setup_dbhandler_logger
-from src.CONSTANS import MAIN_API, FIXTURES_API, PLAYER_API
+from src.CONSTANS import MAIN_API, FIXTURES_API, PLAYER_API, PERFORMANCE_GW_API
 
 
 class DBHandler:
@@ -238,7 +239,41 @@ class DBHandler:
             self._upload_raw_data(schema='raw', table_name='players_fixtures',
                                   records=player_fixtures, columns=columns, ingestion_time=ingestion_time)
 
-    def _upload_raw_data(self, schema: str, table_name: str, records: list, columns: list, ingestion_time: datetime) -> None:
+    def update_points_explain(self):
+        """Function updates the raw data for raw.points_explain table.
+
+        Raises:
+            Exception: when data from API does not match PerformanceGW model requirements."""
+
+        self._logger.info('raw.points_explain table update starting...')
+        ingestion_time = datetime.now(timezone.utc)
+        columns = list(PointsExplain.model_fields.keys())
+        gw_ids = self._get_started_events()
+        _api_session = self._api_session()
+
+        for gw_id in gw_ids:
+            api_result = _api_session.get(PERFORMANCE_GW_API+f'{gw_id}/live').json()
+            api_result = api_result['elements']
+            for element in api_result:
+                for stat in element['explain'][0]['stats']:
+                    stat['id'] = element['id']
+                    stat['fixture'] = element['explain'][0]['fixture']
+                    try:
+                        self._logger.info(f"Validating points explain values for {stat['id']} " +
+                                          "in fixture {stat['fixture']} returned by API...")
+                        explain = [PointsExplain.model_validate(stat)]
+                        self._logger.info(f"Points explain fields for {stat['id']} "
+                                          + f"in fixture {stat['fixture']} are correct.")
+                    except Exception as e:
+                        self._logger.error(f"An error occured during points explain for {stat['id']} " +
+                                           f"in fixture {stat['fixture']} fields validation: {e}. Raising error.")
+                        self._pg_conn.close()
+                        raise e
+
+                    self._upload_raw_data(schema='raw', table_name='points_explain', records=explain, columns=columns, ingestion_time=ingestion_time)
+
+    def _upload_raw_data(self, schema: str, table_name: str, records: list,
+                         columns: list, ingestion_time: datetime) -> None:
         """Function uploads raw data from API to given table in given schema.
 
         Args:
@@ -299,5 +334,27 @@ class DBHandler:
             return players_ids
         except Exception as e:
             self._logger.info(f'An error occured during selecting player ids: {e}. Raising error.')
+            self._pg_conn.close()
+            raise e
+
+    def _get_started_events(self) -> list[int]:
+        """Function returns ids of GW that already have started.
+
+        Returns:
+            gw_ids(list[int]): gw ids in ascending order
+        Raises:
+            Exception: when there is an issue with selecting the data."""
+        try:
+            self._logger.info('Selecting ids of GW that already have started...')
+            sql_select = """select id from raw.events
+                            where finished is true
+                            or is_current is true
+                            order by id asc"""
+            with self._pg_conn.cursor() as cursor:
+                cursor.execute(sql_select)
+                gw_ids = [result[0] for result in cursor.fetchall()]
+            return gw_ids
+        except Exception as e:
+            self._logger.info(f'An error occured during selecting gw ids: {e}. Raising error.')
             self._pg_conn.close()
             raise e
