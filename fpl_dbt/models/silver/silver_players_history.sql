@@ -2,6 +2,7 @@
     materialized='incremental',
     incremental_strategy='merge',
     unique_key=['element', 'fixture'],
+    post_hook = "{{ create_index(this, 'element')}}",
     alias='players_history'
 ) }}
 
