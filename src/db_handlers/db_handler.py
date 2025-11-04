@@ -258,19 +258,19 @@ class DBHandler:
                 for stat in element['explain'][0]['stats']:
                     stat['id'] = element['id']
                     stat['fixture'] = element['explain'][0]['fixture']
-                    try:
-                        self._logger.info(f"Validating points explain values for {stat['id']} " +
-                                          "in fixture {stat['fixture']} returned by API...")
-                        explain = [PointsExplain.model_validate(stat)]
-                        self._logger.info(f"Points explain fields for {stat['id']} "
-                                          + f"in fixture {stat['fixture']} are correct.")
-                    except Exception as e:
-                        self._logger.error(f"An error occured during points explain for {stat['id']} " +
-                                           f"in fixture {stat['fixture']} fields validation: {e}. Raising error.")
-                        self._pg_conn.close()
-                        raise e
+                try:
+                    self._logger.info(f"Validating points explain values for player {stat['id']} " +
+                                      f"in fixture {element['explain'][0]['fixture']} returned by API...")
+                    explain = [PointsExplain.model_validate(stat) for stat in element['explain'][0]['stats']]
+                    self._logger.info(f"Points explain fields for {stat['id']} "
+                                      + f"in fixture {stat['fixture']} are correct.")
+                except Exception as e:
+                    self._logger.error(f"An error occured during points explain for {stat['id']} " +
+                                       f"in fixture {stat['fixture']} fields validation: {e}. Raising error.")
+                    self._pg_conn.close()
+                    raise e
 
-                    self._upload_raw_data(schema='raw', table_name='points_explain', records=explain, columns=columns, ingestion_time=ingestion_time)
+                self._upload_raw_data(schema='raw', table_name='points_explain', records=explain, columns=columns, ingestion_time=ingestion_time)
 
     def _upload_raw_data(self, schema: str, table_name: str, records: list,
                          columns: list, ingestion_time: datetime) -> None:

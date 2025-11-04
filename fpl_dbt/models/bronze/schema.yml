@@ -129,3 +129,17 @@ models:
         to: ref('bronze_events')
         to_columns: [id]
         warn_unsupported: true
+
+  - name: bronze_points_explain
+    description: "Latests points explain data."
+    constraints:
+      - type: foreign_key
+        columns: [id]
+        to: ref('bronze_elements')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('bronze_fixtures')
+        to_columns: [id]
+        warn_unsupported: true

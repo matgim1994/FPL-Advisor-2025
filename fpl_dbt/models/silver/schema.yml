@@ -480,3 +480,17 @@ models:
         to: ref('silver_events')
         to_columns: [id]
         warn_unsupported: true
+
+  - name: silver_points_explain
+    description: "Cleaned and indexed points explain data."
+    constraints:
+      - type: foreign_key
+        columns: [id]
+        to: ref('silver_players')
+        to_columns: [id]
+        warn_unsupported: true
+      - type: foreign_key
+        columns: [fixture]
+        to: ref('silver_fixtures')
+        to_columns: [id]
+        warn_unsupported: true
