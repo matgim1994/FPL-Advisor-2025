@@ -22,6 +22,17 @@ class DBHandler:
         self._pg_config = pgconfig
         self._pg_conn = self._setup_connection()
 
+    def update_raw(self) -> None:
+        """Function runs all of the upload methods that update raw schema."""
+
+        self.update_teams()
+        self.update_elements()
+        self.update_events()
+        self.update_fixtures()
+        self.update_players_history()
+        self.update_players_fixtures()
+        self.update_points_explain()
+
     def _setup_connection(self):
         conn = psycopg2.connect(
             host=self._pg_config.host,
@@ -270,7 +281,8 @@ class DBHandler:
                     self._pg_conn.close()
                     raise e
 
-                self._upload_raw_data(schema='raw', table_name='points_explain', records=explain, columns=columns, ingestion_time=ingestion_time)
+                self._upload_raw_data(schema='raw', table_name='points_explain',
+                                      records=explain, columns=columns, ingestion_time=ingestion_time)
 
     def _upload_raw_data(self, schema: str, table_name: str, records: list,
                          columns: list, ingestion_time: datetime) -> None:
