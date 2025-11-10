@@ -7,15 +7,15 @@
 with future_fixtures as (
     select
         t.id,
-        f.id as fixture_id,
+        f.id as fixture,
         f.event,
         case
             when f.team_h = t.id then f.team_a
             else f.team_h
         end as opponent,
         case
-            when f.team_h = t.id then f.team_a_difficulty
-            else f.team_h_difficulty
+            when f.team_h = t.id then f.team_h_difficulty
+            else f.team_a_difficulty
         end as difficulty
     from {{ ref('bronze_teams') }} as t
     cross join lateral
@@ -40,7 +40,7 @@ with future_fixtures as (
 
 SELECT
     id,
-    fixture_id,
+    fixture,
     event,
     opponent,
     difficulty,
