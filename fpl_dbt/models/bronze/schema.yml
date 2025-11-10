@@ -1,145 +1,164 @@
 models:
   - name: bronze_teams
     description: "Latest raw teams data."
-    constraints:
-      - type: primary_key
-        columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
 
   - name: bronze_elements
     description: "Latest raw players data."
-    constraints:
-      - type: primary_key
-        columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team]
-        to: ref('bronze_teams')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: team
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_teams')
 
   - name: bronze_events
     description: "Latest raw events data."
-    constraints:
-      - type: primary_key
-        columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [most_selected]
-        to: ref('bronze_elements')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [most_transferred_in]
-        to: ref('bronze_elements')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [top_element]
-        to: ref('bronze_elements')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [most_captained]
-        to: ref('bronze_elements')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [most_vice_captained]
-        to: ref('bronze_elements')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: most_selected
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_elements')
+      - name: most_transferred_in
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_elements')
+      - name: top_element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_elements')
+      - name: most_captained
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_elements')
+      - name: most_vice_captained
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_elements')
   
   - name: bronze_fixtures
     description: "Latest fixtures data."
-    constraints:
-      - type: primary_key
-        columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [event]
-        to: ref('bronze_events')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team_a]
-        to: ref('bronze_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team_h]
-        to: ref('bronze_teams')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: event
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_events')
+      - name: team_a
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_teams')
+      - name: team_h
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_teams')
 
   - name: bronze_players_history
     description: "Latests players history data."
-    constraints:
-      - type: foreign_key
-        columns: [element]
-        to: ref('bronze_elements')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('bronze_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [opponent_team]
-        to: ref('bronze_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [opponent_team]
-        to: ref('bronze_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [round]
-        to: ref('bronze_events')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_elements')
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_fixtures')
+      - name: opponent_team
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_teams')
+      - name: round
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_events')
 
   - name: bronze_players_fixtures
     description: "Latests players fixtures data."
-    constraints:
-      - type: foreign_key
-        columns: [element]
-        to: ref('bronze_elements')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [id]
-        to: ref('bronze_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team_h]
-        to: ref('bronze_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team_a]
-        to: ref('bronze_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [event]
-        to: ref('bronze_events')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_elements')
+      - name: id
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_fixtures')
+      - name: team_h
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_teams')
+      - name: team_a
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_teams')
+      - name: event
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_events')
 
   - name: bronze_points_explain
     description: "Latests points explain data."
-    constraints:
-      - type: foreign_key
-        columns: [id]
-        to: ref('bronze_elements')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('bronze_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: id
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_elements')
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('bronze_fixtures')

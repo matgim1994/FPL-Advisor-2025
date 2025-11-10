@@ -1,496 +1,564 @@
 models:
   - name: silver_teams
     description: "Cleared teams data."
-    constraints:
-      - type: primary_key
-        columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
 
   - name: silver_players
     description: "Cleaned players data."
-    constraints:
-      - type: primary_key
-        columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team]
-        to: ref('silver_teams')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: team
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_teams')
 
   - name: silver_events
     description: "Cleaned events data."
-    constraints:
-      - type: primary_key
-        columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
   
   - name: silver_top_players
     description: "Top players, top transferred players etc. per gameweek."
-    constraints:
-      - type: foreign_key
-        columns: [event]
-        to: ref('silver_events')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [most_selected]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [most_transferred_in]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [top_element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [most_captained]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [most_vice_captained]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: event
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_events')
+      - name: most_selected
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
+      - name: most_transferred_in
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
+      - name: top_element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
+      - name: most_captained
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
+      - name: most_vice_captained
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_fixtures
     description: "Cleaned fixtures data containing only main game stats."
     columns:
       - name: id
-        description: "Fixture id."
-      - name: code
-        description: "Fixture code."
+        data_tests:
+          - unique
+          - not_null
       - name: event
-        description: "Event id."
-      - name: finished
-        description: "Boolean value informing if game has finished."
-      - name: kickoff_time
-        description: "Kickoff time"
-      - name: started
-        description: "Boolean value informing if game has started"
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_events')
       - name: team_a
-        description: "Away team id."
-      - name: team_a_score
-        description: "Away team score."
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_teams')
       - name: team_h
-        description: "Home team id."
-      - name: team_h_score
-        description: "Home team score."
-      - name: team_h_difficulty
-        description: "Home team difficulty points."
-      - name: team_a_difficulty
-        description: "Away team difficulty points."
-    constraints:
-      - type: primary_key
-        columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [event]
-        to: ref('silver_events')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team_a]
-        to: ref('silver_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team_h]
-        to: ref('silver_teams')
-        to_columns: [id]
-        warn_unsupported: true
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_teams')
 
   - name: silver_chips_played
     description: "Top players, top transferred players etc. per gameweek."
-    constraints:
-      - type: foreign_key
-        columns: [event]
-        to: ref('silver_events')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: event
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_events')
 
   - name: silver_goalscorers_away
     description: "Goalscorers from away team per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_goalscorers_home
     description: "Goalscorers from home team per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_assistants_away
     description: "Assistants from away team per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_assistants_home
     description: "Assistants from home team per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_owngoalscorers_away
     description: "Own goalscorers from away team per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_owngoalscorers_home
     description: "Own goalscorers from home team per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_penalty_save_away
     description: "Penalty savers from away team per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_penalty_save_home
     description: "Penalty savers from home team per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_penalty_missed_away
     description: "Players from away team who missed penalty per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_penalty_missed_home
     description: "Players from home team who missed penalty per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_yellow_cards_away
     description: "Players from away team who saw yellow card per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_yellow_cards_home
     description: "Players from home team who saw yellow card per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_red_cards_away
     description: "Players from away team who saw red card per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_red_cards_home
     description: "Players from home team who saw red card per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_saves_away
     description: "Number of saves per player from away per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_saves_home
     description: "Number of saves per player from home per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_bonus_away
     description: "Players from away team who obtained bonus points per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_bonus_home
     description: "Players from home team who obtained bonus points per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_bps_away
     description: "Players from away team bps per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_bps_home
     description: "Players from home team bps per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_dc_away
     description: "Players from away team defensive contributions per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_dc_home
     description: "Players from home team defensive contributions per fixture"
-    constraints:
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
 
   - name: silver_players_history
     description: "Cleaned players history data."
-    constraints:
-      - type: foreign_key
-        columns: [element]
-        to: ref('bronze_elements')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('bronze_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [opponent_team]
-        to: ref('bronze_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [opponent_team]
-        to: ref('bronze_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [round]
-        to: ref('bronze_events')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: round
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_events')
+      - name: opponent_team
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_teams')
 
   - name: silver_players_fixtures
     description: "Cleaned and indexed players fixtures data."
-    constraints:
-      - type: foreign_key
-        columns: [element]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [id]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team_h]
-        to: ref('silver_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [team_a]
-        to: ref('silver_teams')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [event]
-        to: ref('silver_events')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: element
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
+      - name: id
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: team_h
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_teams')
+      - name: team_a
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_teams')
+      - name: event
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_events')
 
   - name: silver_points_explain
     description: "Cleaned and indexed points explain data."
-    constraints:
-      - type: foreign_key
-        columns: [id]
-        to: ref('silver_players')
-        to_columns: [id]
-        warn_unsupported: true
-      - type: foreign_key
-        columns: [fixture]
-        to: ref('silver_fixtures')
-        to_columns: [id]
-        warn_unsupported: true
+    columns:
+      - name: id
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_players')
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+
+  - name: silver_teams_future_fixtures
+    description: "Data on 5 next opponents for each team."
+    columns:
+      - name: id
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_teams')
+      - name: fixture
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_fixtures')
+      - name: event
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_events')
+      - name: opponent
+        data_tests:
+          - relationships:
+              arguments:
+                field: id
+                to: ref('silver_teams')

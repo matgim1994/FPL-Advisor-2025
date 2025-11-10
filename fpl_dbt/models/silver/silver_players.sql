@@ -95,7 +95,7 @@ with source_data as (
         clean_sheets_per_90,
         defensive_contribution_per_90
     from {{ ref('bronze_elements') }}
-    where can_select is True
+    where can_select is True or can_transact is True
 )
 
 select *
