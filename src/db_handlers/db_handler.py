@@ -370,3 +370,41 @@ class DBHandler:
             self._logger.info(f'An error occured during selecting gw ids: {e}. Raising error.')
             self._pg_conn.close()
             raise e
+
+    def _execute_sql_script(self, filepath: str) -> None:
+        """Function executes query from .sql file.
+
+        Args:
+            filepath(str): path to the .sql file
+        Raises:
+            Exception: when there is an issue with executing given query."""
+
+        self._logger.info(f"Starting execution of SQL commands from: {filepath} file")
+        try:
+            fd = open(filepath, 'r')
+            sql_file = fd.read()
+            fd.close()
+
+            sql_commands = sql_file.split(';')
+            for command in sql_commands:
+                command = command.strip()
+                if not command or command.startswith('--'):
+                    continue
+                self._logger.info(f"Executing {command[:60]} command...")
+                with self._pg_conn.cursor() as cursor:
+                    cursor.execute(command)
+                    self._pg_conn.commit()
+                self._logger.info("SQL query ran correctly.")
+        except Exception as e:
+            self._logger.error(f"An error occured during execution of SQL command: "+
+                               f"{e}. Raising error.")
+            self._pg_conn.close()
+            raise e
+
+    # def setup_raw_tables(self) -> None:
+    #     """Function creates necessary objects in raw schema.
+
+    #     Raises:
+    #         Exception: when there is an issue with creating required objects."""
+
+
