@@ -14,4 +14,5 @@ pgconfig = PGConfig(
 )
 dbhandler = DBHandler(pgconfig=pgconfig)
 
-dbhandler.update_raw()
+# dbhandler.update_raw()
+dbhandler._execute_sql_script(filepath='/home/mgimzinski/projects/fpl/src/db_handlers/sql/elements.sql')
