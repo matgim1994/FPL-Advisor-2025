@@ -1,4 +1,4 @@
-CREATE TABLE raw.elements (
+CREATE TABLE IF NOT EXISTS raw.elements (
 	id int4,
 	can_transact bool,
 	can_select bool,
@@ -104,19 +104,19 @@ CREATE TABLE raw.elements (
 )
 PARTITION BY RANGE (ingestion_time);
 
-CREATE TABLE raw.elements_october PARTITION OF raw.elements
+CREATE TABLE IF NOT EXISTS raw.elements_october PARTITION OF raw.elements
     FOR VALUES FROM ('2025-10-01') TO ('2025-11-01');
-CREATE TABLE raw.elements_november PARTITION OF raw.elements
+CREATE TABLE IF NOT EXISTS raw.elements_november PARTITION OF raw.elements
     FOR VALUES FROM ('2025-11-01') TO ('2025-12-01');
-CREATE TABLE raw.elements_december PARTITION OF raw.elements
+CREATE TABLE IF NOT EXISTS raw.elements_december PARTITION OF raw.elements
     FOR VALUES FROM ('2025-12-01') TO ('2026-01-01');
-CREATE TABLE raw.elements_january PARTITION OF raw.elements
+CREATE TABLE IF NOT EXISTS raw.elements_january PARTITION OF raw.elements
     FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
-CREATE TABLE raw.elements_february PARTITION OF raw.elements
+CREATE TABLE IF NOT EXISTS raw.elements_february PARTITION OF raw.elements
     FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');
-CREATE TABLE raw.elements_march PARTITION OF raw.elements
+CREATE TABLE IF NOT EXISTS raw.elements_march PARTITION OF raw.elements
     FOR VALUES FROM ('2026-03-01') TO ('2026-04-01');
-CREATE TABLE raw.elements_april PARTITION OF raw.elements
+CREATE TABLE IF NOT EXISTS raw.elements_april PARTITION OF raw.elements
     FOR VALUES FROM ('2026-04-01') TO ('2026-05-01');
-CREATE TABLE raw.elements_may PARTITION OF raw.elements
+CREATE TABLE IF NOT EXISTS raw.elements_may PARTITION OF raw.elements
     FOR VALUES FROM ('2026-05-01') TO ('2026-06-01');

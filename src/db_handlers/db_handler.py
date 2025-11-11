@@ -1,6 +1,7 @@
 import psycopg2
 import requests
 import json
+import os
 from datetime import datetime, timezone
 from src.models.pg_config import PGConfig
 from src.models.event import Event
@@ -379,7 +380,6 @@ class DBHandler:
         Raises:
             Exception: when there is an issue with executing given query."""
 
-        self._logger.info(f"Starting execution of SQL commands from: {filepath} file")
         try:
             fd = open(filepath, 'r')
             sql_file = fd.read()
@@ -401,8 +401,15 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-    # def setup_raw_tables(self) -> None:
-    #     """Function creates necessary objects in raw schema.
+    def setup_raw_tables(self) -> None:
+        """Function creates necessary objects in raw schema.
 
-    #     Raises:
-    #         Exception: when there is an issue with creating required objects."""
+        Raises:
+            Exception: when there is an issue with creating required objects."""
+
+        self._logger.info("Starting creating fresh raw tables...")
+
+        for filename in os.listdir("./src/db_handlers/sql/raw_tables"):
+            self._execute_sql_script(filepath=f'./src/db_handlers/sql/raw_tables/{filename}')
+
+        self._logger.info("Raw tables created successfully.")
