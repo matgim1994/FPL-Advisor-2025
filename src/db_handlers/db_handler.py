@@ -388,7 +388,7 @@ class DBHandler:
             sql_commands = sql_file.split(';')
             for command in sql_commands:
                 command = command.strip()
-                if not command or command.startswith('--'):
+                if not command:
                     continue
                 self._logger.info(f"Executing {command[:60]} command...")
                 with self._pg_conn.cursor() as cursor:
@@ -396,7 +396,7 @@ class DBHandler:
                     self._pg_conn.commit()
                 self._logger.info("SQL query ran correctly.")
         except Exception as e:
-            self._logger.error(f"An error occured during execution of SQL command: "+
+            self._logger.error("An error occured during execution of SQL command: " +
                                f"{e}. Raising error.")
             self._pg_conn.close()
             raise e
@@ -406,5 +406,3 @@ class DBHandler:
 
     #     Raises:
     #         Exception: when there is an issue with creating required objects."""
-
-
