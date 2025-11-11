@@ -40,6 +40,13 @@ def setup_dbhandler_logger() -> None:
     _setup_logger(logger_name='db_handler', logs_folder_path=logs_folder_path)
 
 
+def setup_first_setup_logger() -> None:
+    """Method used to setup dbhandler logger."""
+
+    logs_folder_path = os.path.join(LOGS_FOLDER_NAME, DBHANDLER_LOGS_FOLDER_NAME)
+    _setup_logger(logger_name='first_setup', logs_folder_path=logs_folder_path)
+
+
 def get_logger(logger_name: str) -> logging.Logger:
     """Method used to return logger object.
 
