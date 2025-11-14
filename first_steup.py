@@ -6,6 +6,7 @@ pgconfig = get_pg_config()
 dbhandler = DBHandler(pgconfig=pgconfig)
 dbthandler = DBTHandler()
 
+dbhandler.create_fpl_db_schema()
 dbhandler.setup_raw_tables()
 dbhandler.update_raw()
 dbthandler.run_dbt_models()

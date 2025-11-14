@@ -413,3 +413,25 @@ class DBHandler:
             self._execute_sql_script(filepath=f'./src/db_handlers/sql/raw_tables/{filename}')
 
         self._logger.info("Raw tables created successfully.")
+
+    def create_fpl_db_schema(self) -> None:
+        """Function creates raw schema if not exists.
+
+        Raises:
+            Exception: when there is an issue with creating raw schema"""
+
+        try:
+            sql_check = """select nspname from pg_namespace"""
+            with self._pg_conn.cursor() as cursor:
+                cursor.execute(sql_check)
+                results = cursor.fetchall()
+                if 'raw' not in [result[0] for result in results]:
+                    self._logger.info("Raw schema does not exist...")
+                    self._execute_sql_script(filepath='./src/db_handlers/sql/schemas/raw.sql')
+                    self._logger.info("Raw schema created successfully.")
+                else:
+                    self._logger.info("Raw schema already exists.")
+        except Exception as e:
+            self._logger.error(f'An error occured during schema check: {e} ' +
+                               'Raising error.')
+            raise e
