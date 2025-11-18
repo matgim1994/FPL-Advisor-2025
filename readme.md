@@ -77,7 +77,16 @@ The data transformation layer relies on **dbt**. All logic for moving data from 
 * **Project Location:** All dbt models, tests, and configuration files are located in the `fpl_dbt` directory.
 * **Testing:** Data quality is maintained by comprehensive dbt tests executed during the `-rd` command.
 
-For detailed model documentation, please refer to the files within the `fpl_dbt` folder.
+For complete, interactive documentation of the data flow, models, column definitions, and tests, please follow these steps:
+
+1.  **Generate Documentation Artifacts:** Ensure you have the latest project metadata by running:
+    ```bash
+    dbt docs generate
+    ```
+2.  **Serve Documentation Site:** Start the local web server to view the interactive documentation:
+    ```bash
+    dbt docs serve
+    ```
 
 ## 🔮 Roadmap and Future Development
 
