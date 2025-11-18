@@ -7,9 +7,9 @@
 ## 🛠 Prerequisites
 
 * **Docker:** Used for containerizing the PostgreSQL database instance.
-* **Python (3.11.2 or newer):** The primary language environment.
-* **Linux Environment:** Recommended for optimal Docker and script execution performance.
-* **DBeaver (or similar):** Recommended for browsing and querying the database.
+* **Python (3.11.2 or newer)**
+* **Linux Environment**
+* **DBeaver (or similar)**
 
 ## ⚙️ Installation Guide
 
