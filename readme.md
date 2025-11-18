@@ -17,7 +17,7 @@ Follow these steps to set up the project locally:
 
 1.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/matgim1994/FPL-Advisor-2025.git](https://github.com/matgim1994/FPL-Advisor-2025.git)
+    git clone https://github.com/matgim1994/FPL-Advisor-2025.git
     ```
 
 2.  **Setup Python Environment:**
