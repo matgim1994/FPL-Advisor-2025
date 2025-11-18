@@ -96,7 +96,7 @@ As FPL Advisor is under active development, there are several key features plann
 | :--- | :--- | :--- |
 | **Django REST API** | Implementing a production-ready REST API using Django to serve data from the `gold` schema. | In Progress |
 | **Gold Layer Enrichment** | Extracting further analytical insights from the `silver` layer. | In Progress |
-| **Automated Scheduling** | Implementing workflow orchestration (e.g., using Cron jobs or Airflow) to automate the `-ur` and `-rd` commands. | In Progress |
+| **Automated Scheduling** | Implementing workflow orchestration using Airflow to automate the `-ur` and `-rd` commands. | In Progress |
 | **Web Interface (BI)** | Development of a lightweight web interface for easy data visualization and recomendations. | Planned |
 | **External Data Sources** | Integrating secondary data sources (e.g., injuries, betting odds) to enrich the `silver` layer. | Planned |
 
