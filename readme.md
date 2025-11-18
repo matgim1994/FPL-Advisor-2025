@@ -105,7 +105,7 @@ As FPL Advisor is under active development, there are several key features plann
 Before opening a new issue, please check the following list of known problems:
 
 * **Issue:** The `silver` layer contains significantly more data/tables than the `gold` layer.
-    * **Answer:** This is intentional at the current stage. The `gold` layer enrichment is an ongoing process; please refer to the **Roadmap** section for planned updates.
+    * **Answer:** This is intentional at the current stage. The `gold` layer enrichment is an ongoing process. Please refer to the **Roadmap** section for planned updates.
 * **Issue:** There is no API to query the data directly.
     * **Answer:** Implementing a REST API is the next major feature planned for development. See the **Roadmap** section for the status of the **Django REST API** integration.
 * **Issue:** Application logs are stored separately from dbt logs.
