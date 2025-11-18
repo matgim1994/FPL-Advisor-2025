@@ -1,0 +1,5 @@
+FPL_PG_USER=<your_postgres_user_name>
+FPL_PG_PASS=<your_postgres_password>
+FPL_PG_DB=<your_database_name>
+FPL_PG_HOST=<host_ip>
+FPL_PG_PORT=<host_port>
