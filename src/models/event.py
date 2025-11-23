@@ -50,4 +50,5 @@ class Event(BaseModel):
     transfers_made: Optional[int]
     most_captained: Optional[int]
     most_vice_captained: Optional[int]
+    data_hash: Optional[str] = None
     ingestion_time: Optional[datetime] = None

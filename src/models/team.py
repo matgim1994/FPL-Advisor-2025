@@ -25,4 +25,5 @@ class Team(BaseModel):
     strength_defence_home: int
     strength_defence_away: int
     pulse_id: int
+    data_hash: Optional[str] = None
     ingestion_time: Optional[datetime] = None

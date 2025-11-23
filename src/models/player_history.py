@@ -45,4 +45,5 @@ class PlayerHistory(BaseModel):
     selected: int
     transfers_in: int
     transfers_out: int
+    data_hash: Optional[str] = None
     ingestion_time: Optional[datetime] = None

@@ -20,23 +20,7 @@ CREATE TABLE IF NOT EXISTS raw.teams (
 	strength_defence_home int4 NULL,
 	strength_defence_away int4 NULL,
 	pulse_id int4 NULL,
-	ingestion_time timestamp NULL
-)
-PARTITION BY RANGE (ingestion_time);
-
-CREATE TABLE IF NOT EXISTS raw.teams_october PARTITION OF raw.teams
-    FOR VALUES FROM ('2025-10-01') TO ('2025-11-01');
-CREATE TABLE IF NOT EXISTS raw.teams_november PARTITION OF raw.teams
-    FOR VALUES FROM ('2025-11-01') TO ('2025-12-01');
-CREATE TABLE IF NOT EXISTS raw.teams_december PARTITION OF raw.teams
-    FOR VALUES FROM ('2025-12-01') TO ('2026-01-01');
-CREATE TABLE IF NOT EXISTS raw.teams_january PARTITION OF raw.teams
-    FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
-CREATE TABLE IF NOT EXISTS raw.teams_february PARTITION OF raw.teams
-    FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');
-CREATE TABLE IF NOT EXISTS raw.teams_march PARTITION OF raw.teams
-    FOR VALUES FROM ('2026-03-01') TO ('2026-04-01');
-CREATE TABLE IF NOT EXISTS raw.teams_april PARTITION OF raw.teams
-    FOR VALUES FROM ('2026-04-01') TO ('2026-05-01');
-CREATE TABLE IF NOT EXISTS raw.teams_may PARTITION OF raw.teams
-    FOR VALUES FROM ('2026-05-01') TO ('2026-06-01');
+	data_hash text NULL,
+	ingestion_time timestamp NULL,
+	PRIMARY KEY (id)
+);
