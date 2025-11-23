@@ -21,8 +21,6 @@ def update_raw(dbhandler: DBHandler, dbthandler: DBTHandler):
     dbhandler.create_fpl_db_schema()
     dbhandler.setup_raw_tables()
     dbhandler.update_raw()
-    dbthandler.run_dbt_models()
-    dbthandler.run_dbt_tests()
 
 
 def create_dotenv():

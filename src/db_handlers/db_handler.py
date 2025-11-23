@@ -2,6 +2,7 @@ import psycopg2
 import requests
 import json
 import os
+import hashlib
 from datetime import datetime, timezone
 from src.models.pg_config import PGConfig
 from src.models.event import Event
@@ -31,7 +32,7 @@ class DBHandler:
         self.update_events()
         self.update_fixtures()
         self.update_players_history()
-        self.update_players_fixtures()
+        # self.update_players_fixtures()
         self.update_points_explain()
 
     def _setup_connection(self):
@@ -108,6 +109,9 @@ class DBHandler:
         self._logger.info('raw.events table update starting...')
         ingestion_time = datetime.now(timezone.utc)
         columns = list(Event.model_fields.keys())
+        excluded_hash_columns = ['ingestion_time']
+        hash_columns = [c for c in columns if c not in excluded_hash_columns]
+        primary_keys = ['id']
         api_result = self._api_call(MAIN_API)
 
         try:
@@ -119,8 +123,8 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-        self._upload_raw_data(schema='raw', table_name='events',
-                              records=events, columns=columns, ingestion_time=ingestion_time)
+        self._upsert_raw_data(schema='raw', table_name='events', records=events, columns=columns,
+                              hash_columns=hash_columns, primary_keys=primary_keys, ingestion_time=ingestion_time)
 
     def update_elements(self):
         """Function updates the raw data for raw.elements table.
@@ -131,6 +135,9 @@ class DBHandler:
         self._logger.info('raw.elements table update starting...')
         ingestion_time = datetime.now(timezone.utc)
         columns = list(Element.model_fields.keys())
+        excluded_hash_columns = ['ingestion_time']
+        hash_columns = [c for c in columns if c not in excluded_hash_columns]
+        primary_keys = ['id']
         api_result = self._api_call(MAIN_API)
 
         try:
@@ -142,8 +149,8 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-        self._upload_raw_data(schema='raw', table_name='elements',
-                              records=elements, columns=columns, ingestion_time=ingestion_time)
+        self._upsert_raw_data(schema='raw', table_name='elements', records=elements, columns=columns,
+                              hash_columns=hash_columns, primary_keys=primary_keys, ingestion_time=ingestion_time)
 
     def update_teams(self):
         """Function updates the raw data for raw.teams table.
@@ -154,6 +161,9 @@ class DBHandler:
         self._logger.info('raw.teams table update starting...')
         ingestion_time = datetime.now(timezone.utc)
         columns = list(Team.model_fields.keys())
+        excluded_hash_columns = ['ingestion_time']
+        hash_columns = [c for c in columns if c not in excluded_hash_columns]
+        primary_keys = ['id']
         api_result = self._api_call(MAIN_API)
 
         try:
@@ -165,8 +175,8 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-        self._upload_raw_data(schema='raw', table_name='teams',
-                              records=teams, columns=columns, ingestion_time=ingestion_time)
+        self._upsert_raw_data(schema='raw', table_name='teams', records=teams, columns=columns,
+                              hash_columns=hash_columns, primary_keys=primary_keys, ingestion_time=ingestion_time)
 
     def update_fixtures(self):
         """Function updates the raw data for raw.fixtures table.
@@ -177,6 +187,9 @@ class DBHandler:
         self._logger.info('raw.fixtures table update starting...')
         ingestion_time = datetime.now(timezone.utc)
         columns = list(Fixture.model_fields.keys())
+        excluded_hash_columns = ['ingestion_time']
+        hash_columns = [c for c in columns if c not in excluded_hash_columns]
+        primary_keys = ['id']
         api_result = self._api_call(FIXTURES_API)
 
         try:
@@ -188,8 +201,8 @@ class DBHandler:
             self._pg_conn.close()
             raise e
 
-        self._upload_raw_data(schema='raw', table_name='fixtures',
-                              records=fixtures, columns=columns, ingestion_time=ingestion_time)
+        self._upsert_raw_data(schema='raw', table_name='fixtures', records=fixtures, columns=columns,
+                              hash_columns=hash_columns, primary_keys=primary_keys, ingestion_time=ingestion_time)
 
     def update_players_history(self):
         """Function updates the raw data for raw.players_history table.
@@ -200,9 +213,13 @@ class DBHandler:
         self._logger.info('raw.players_history table update starting...')
         ingestion_time = datetime.now(timezone.utc)
         columns = list(PlayerHistory.model_fields.keys())
+        excluded_hash_columns = ['ingestion_time']
+        hash_columns = [c for c in columns if c not in excluded_hash_columns]
+        primary_keys = ['element', 'fixture']
         players_ids = self._get_players_ids()
         _api_session = self._api_session()
 
+        records = []
         for player_id in players_ids:
             api_result = _api_session.get(PLAYER_API + str(player_id)).json()
             api_result = api_result['history']
@@ -211,14 +228,15 @@ class DBHandler:
                 self._logger.info(f'Validating player {player_id} history fields returned by API...')
                 history = [PlayerHistory.model_validate(element) for element in api_result]
                 self._logger.info(f'Players {player_id} history fields are correct.')
+                records.extend(history)
             except Exception as e:
                 self._logger.error(f'An error occured during player {player_id} ' +
                                    f'history fields validation: {e}. Raising error.')
                 self._pg_conn.close()
                 raise e
 
-            self._upload_raw_data(schema='raw', table_name='players_history',
-                                  records=history, columns=columns, ingestion_time=ingestion_time)
+        self._upsert_raw_data(schema='raw', table_name='players_history', records=records, columns=columns,
+                              hash_columns=hash_columns, primary_keys=primary_keys, ingestion_time=ingestion_time)
 
     def update_players_fixtures(self):
         """Function updates the raw data for raw.players_upcoming_fixtures table.
@@ -260,9 +278,13 @@ class DBHandler:
         self._logger.info('raw.points_explain table update starting...')
         ingestion_time = datetime.now(timezone.utc)
         columns = list(PointsExplain.model_fields.keys())
+        excluded_hash_columns = ['ingestion_time']
+        hash_columns = [c for c in columns if c not in excluded_hash_columns]
+        primary_keys = ['id', 'fixture', 'identifier']
         gw_ids = self._get_started_events()
         _api_session = self._api_session()
 
+        records = []
         for gw_id in gw_ids:
             api_result = _api_session.get(PERFORMANCE_GW_API+f'{gw_id}/live').json()
             api_result = api_result['elements']
@@ -274,6 +296,7 @@ class DBHandler:
                     self._logger.info(f"Validating points explain values for player {stat['id']} " +
                                       f"in fixture {element['explain'][0]['fixture']} returned by API...")
                     explain = [PointsExplain.model_validate(stat) for stat in element['explain'][0]['stats']]
+                    records.extend(explain)
                     self._logger.info(f"Points explain fields for {stat['id']} "
                                       + f"in fixture {stat['fixture']} are correct.")
                 except Exception as e:
@@ -282,8 +305,8 @@ class DBHandler:
                     self._pg_conn.close()
                     raise e
 
-                self._upload_raw_data(schema='raw', table_name='points_explain',
-                                      records=explain, columns=columns, ingestion_time=ingestion_time)
+        self._upsert_raw_data(schema='raw', table_name='points_explain', records=records, columns=columns,
+                              hash_columns=hash_columns, primary_keys=primary_keys, ingestion_time=ingestion_time)
 
     def _upload_raw_data(self, schema: str, table_name: str, records: list,
                          columns: list, ingestion_time: datetime) -> None:
@@ -320,6 +343,57 @@ class DBHandler:
             self._logger.info(f'Data ingested to {schema}.{table_name} table successfully.')
         except Exception as e:
             self._logger.info(f'An error occured during data ingestion to {schema}.{table_name}: {e}. Raising error.')
+            self._pg_conn.close()
+            raise e
+
+    def _upsert_raw_data(self, schema: str, table_name: str, records: list, columns: list,
+                         hash_columns: list, primary_keys: list, ingestion_time: datetime) -> None:
+        """Function upserts raw data from API to given table in given schema.
+
+        Args:
+            schema (str): destination table schema
+            table_name (str): destination table name
+            records (list): list of dicts where single dict is a single record
+            columns (list): list of columns in the destination table
+            hash_columns(list): list of columns to be included in data hashing
+            primary_keys(list): list of primary key columns
+            ingestion_time(datetime): time of data ingestion
+
+        Raises:
+            Exception: when there is an issue during data upload
+        """
+        try:
+            self._logger.info(f'Starting upserting data to {schema}.{table_name} table...')
+            bind_values = []
+            for record in records:
+                record.ingestion_time = ingestion_time
+                record.data_hash = self._compute_hash(record, hash_columns)
+                event_dict = record.model_dump()
+                values = [json.dumps(event_dict[c]) if isinstance(event_dict[c], (dict, list))
+                          else event_dict[c] for c in columns]
+                values_tuple = tuple(values)
+                bind_values.append(values_tuple)
+
+            columns_str = ', '.join(f'"{c}"' for c in columns)
+            placeholders = ', '.join(['%s'] * len(columns))
+            pk_str = ', '.join(primary_keys)
+            set_columns = []
+            for col in columns:
+                if col not in primary_keys:
+                    set_columns.append(f"{col} = excluded.{col}")
+            set_clause = ', '.join(set_columns)
+            sql_upsert = f"""insert into {schema}.{table_name}({columns_str})
+                             values({placeholders})
+                             on conflict ({pk_str})
+                             do update set {set_clause}
+                             where {table_name}.data_hash is distinct from excluded.data_hash"""
+            with self._pg_conn.cursor() as cursor:
+                cursor.executemany(sql_upsert, bind_values)
+                self._pg_conn.commit()
+            self._logger.info(f'{schema}.{table_name} table upserted successfully. ' +
+                              f'{cursor.rowcount} rows affected.')
+        except Exception as e:
+            self._logger.info(f'An error occured during {schema}.{table_name} upsert: {e}. Raising error.')
             self._pg_conn.close()
             raise e
 
@@ -399,6 +473,26 @@ class DBHandler:
             self._logger.error("An error occured during execution of SQL command: " +
                                f"{e}. Raising error.")
             self._pg_conn.close()
+            raise e
+
+    def _compute_hash(self, record: dict, hash_columns: list) -> hashlib.sha256:
+        """Fuction hashing values in given record.
+
+        Args:
+            record(dict): a single record which is meant to be inserted to db
+            hash_columns(list): column names which are meant to be included in hashing
+        Raises:
+            Exception: where there is an issue with creating hash value
+        Returns:
+            hashlib.sha256: hashed values from given record"""
+
+        try:
+            data = {c: getattr(record, c, None) for c in hash_columns}
+            serialized = json.dumps(data, sort_keys=True, ensure_ascii=False, default=str)
+            return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+        except Exception as e:
+            self._logger.error(f'Error during hashing record {record}: {e}' +
+                               'Raising error.')
             raise e
 
     def setup_raw_tables(self) -> None:

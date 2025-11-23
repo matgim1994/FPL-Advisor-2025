@@ -105,4 +105,5 @@ class Element(BaseModel):
     starts_per_90: float
     clean_sheets_per_90: float
     defensive_contribution_per_90: float
+    data_hash: Optional[str] = None
     ingestion_time: Optional[datetime] = None

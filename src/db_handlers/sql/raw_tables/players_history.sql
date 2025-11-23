@@ -40,23 +40,7 @@ CREATE TABLE IF NOT EXISTS raw.players_history (
 	selected int4,
 	transfers_in int4,
 	transfers_out int4,
-	ingestion_time timestamp
-)
-PARTITION BY RANGE (ingestion_time);
-
-CREATE TABLE IF NOT EXISTS raw.players_history_october PARTITION OF raw.players_history
-    FOR VALUES FROM ('2025-10-01') TO ('2025-11-01');
-CREATE TABLE IF NOT EXISTS raw.players_history_november PARTITION OF raw.players_history
-    FOR VALUES FROM ('2025-11-01') TO ('2025-12-01');
-CREATE TABLE IF NOT EXISTS raw.players_history_december PARTITION OF raw.players_history
-    FOR VALUES FROM ('2025-12-01') TO ('2026-01-01');
-CREATE TABLE IF NOT EXISTS raw.players_history_january PARTITION OF raw.players_history
-    FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
-CREATE TABLE IF NOT EXISTS raw.players_history_february PARTITION OF raw.players_history
-    FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');
-CREATE TABLE IF NOT EXISTS raw.players_history_march PARTITION OF raw.players_history
-    FOR VALUES FROM ('2026-03-01') TO ('2026-04-01');
-CREATE TABLE IF NOT EXISTS raw.players_history_april PARTITION OF raw.players_history
-    FOR VALUES FROM ('2026-04-01') TO ('2026-05-01');
-CREATE TABLE IF NOT EXISTS raw.players_history_may PARTITION OF raw.players_history
-    FOR VALUES FROM ('2026-05-01') TO ('2026-06-01');
+	data_hash text,
+	ingestion_time timestamp,
+	PRIMARY KEY (element, fixture)
+);

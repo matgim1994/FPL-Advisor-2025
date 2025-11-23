@@ -33,4 +33,5 @@ class Fixture(BaseModel):
     team_h_difficulty: int
     team_a_difficulty: int
     pulse_id: int
+    data_hash: Optional[str] = None
     ingestion_time: Optional[datetime] = None

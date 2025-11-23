@@ -100,23 +100,7 @@ CREATE TABLE IF NOT EXISTS raw.elements (
 	starts_per_90 numeric,
 	clean_sheets_per_90 numeric,
 	defensive_contribution_per_90 numeric,
-	ingestion_time timestamp
-)
-PARTITION BY RANGE (ingestion_time);
-
-CREATE TABLE IF NOT EXISTS raw.elements_october PARTITION OF raw.elements
-    FOR VALUES FROM ('2025-10-01') TO ('2025-11-01');
-CREATE TABLE IF NOT EXISTS raw.elements_november PARTITION OF raw.elements
-    FOR VALUES FROM ('2025-11-01') TO ('2025-12-01');
-CREATE TABLE IF NOT EXISTS raw.elements_december PARTITION OF raw.elements
-    FOR VALUES FROM ('2025-12-01') TO ('2026-01-01');
-CREATE TABLE IF NOT EXISTS raw.elements_january PARTITION OF raw.elements
-    FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
-CREATE TABLE IF NOT EXISTS raw.elements_february PARTITION OF raw.elements
-    FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');
-CREATE TABLE IF NOT EXISTS raw.elements_march PARTITION OF raw.elements
-    FOR VALUES FROM ('2026-03-01') TO ('2026-04-01');
-CREATE TABLE IF NOT EXISTS raw.elements_april PARTITION OF raw.elements
-    FOR VALUES FROM ('2026-04-01') TO ('2026-05-01');
-CREATE TABLE IF NOT EXISTS raw.elements_may PARTITION OF raw.elements
-    FOR VALUES FROM ('2026-05-01') TO ('2026-06-01');
+	data_hash text,
+	ingestion_time timestamp,
+	PRIMARY KEY (id)
+);
