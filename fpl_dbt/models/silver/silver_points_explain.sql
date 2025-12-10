@@ -14,7 +14,7 @@ with source_data as (
         points,
         value,
         points_modification
-    from {{ ref('bronze_points_explain') }}
+    from {{ ref('points_explain_snapshot') }}
 )
 
 select *

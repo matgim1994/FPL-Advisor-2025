@@ -14,7 +14,7 @@ with source_data as (
         (top_element_info -> 'points')::INT as top_element_points,
         most_captained,
         most_vice_captained
-    from {{ ref('bronze_events') }}
+    from {{ ref('events_snapshot') }}
 )
 
 select *

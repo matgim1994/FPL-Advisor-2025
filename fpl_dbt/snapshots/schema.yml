@@ -1,0 +1,49 @@
+snapshots:
+  - name: elements_snapshot
+    relation: source('raw', 'elements')
+    config:
+      database: fpl_db
+      schema: bronze
+      strategy: timestamp
+      updated_at: 'ingestion_time'
+      unique_key: 'id'
+  - name: events_snapshot
+    relation: source('raw', 'events')
+    config:
+      database: fpl_db
+      schema: bronze
+      strategy: timestamp
+      updated_at: 'ingestion_time'
+      unique_key: 'id'
+  - name: fixtures_snapshot
+    relation: source('raw', 'fixtures')
+    config:
+      database: fpl_db
+      schema: bronze
+      strategy: timestamp
+      updated_at: 'ingestion_time'
+      unique_key: 'id'
+  - name: players_history_snapshot
+    relation: source('raw', 'players_history')
+    config:
+      database: fpl_db
+      schema: bronze
+      strategy: timestamp
+      updated_at: 'ingestion_time'
+      unique_key: ['element', 'fixture']
+  - name: points_explain_snapshot
+    relation: source('raw', 'points_explain')
+    config:
+      database: fpl_db
+      schema: bronze
+      strategy: timestamp
+      updated_at: 'ingestion_time'
+      unique_key: ['id', 'fixture', 'identifier']
+  - name: teams_snapshot
+    relation: source('raw', 'teams')
+    config:
+      database: fpl_db
+      schema: bronze
+      strategy: timestamp
+      updated_at: 'ingestion_time'
+      unique_key: 'id'

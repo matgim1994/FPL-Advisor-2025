@@ -94,7 +94,7 @@ with source_data as (
         starts_per_90,
         clean_sheets_per_90,
         defensive_contribution_per_90
-    from {{ ref('bronze_elements') }}
+    from {{ ref('elements_snapshot') }}
     where can_select is True or can_transact is True
 )
 

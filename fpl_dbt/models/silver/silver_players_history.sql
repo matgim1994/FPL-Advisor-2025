@@ -49,7 +49,7 @@ with source_data as (
         selected,
         transfers_in,
         transfers_out
-    from {{ ref('bronze_players_history') }}
+    from {{ ref('players_history_snapshot') }}
 )
 
 select *
