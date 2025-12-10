@@ -32,7 +32,6 @@ class DBHandler:
         self.update_events()
         self.update_fixtures()
         self.update_players_history()
-        # self.update_players_fixtures()
         self.update_points_explain()
 
     def _setup_connection(self):

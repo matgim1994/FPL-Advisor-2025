@@ -26,7 +26,7 @@ with source_data as (
         can_manage,
         ranked_count,
         transfers_made
-    from {{ ref('bronze_events') }}
+    from {{ ref('events_snapshot') }}
 )
 
 select *

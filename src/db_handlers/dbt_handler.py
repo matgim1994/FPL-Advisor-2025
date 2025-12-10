@@ -9,6 +9,12 @@ class DBTHandler(DBHandler):
         self._logger = get_logger(logger_name='db_handler')
         self.dbt_path = './fpl_dbt'
 
+    def run_dbt_snapshot(self):
+        """Function runs dbt snapshot command."""
+
+        self._logger.info("Running dbt snapshot command...")
+        self._execute_command(['dbt', 'snapshot', '--project-dir', self.dbt_path])
+
     def run_dbt_models(self):
         """Function runs dbt run command."""
 

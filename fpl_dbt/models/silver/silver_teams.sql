@@ -20,7 +20,7 @@ with source_data as (
         strength_defence_home,
         strength_defence_away,
         pulse_id
-    from {{ ref('bronze_teams') }}
+    from {{ ref('teams_snapshot') }}
 )
 
 select *

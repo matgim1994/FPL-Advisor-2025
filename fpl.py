@@ -8,16 +8,18 @@ def first_setup(dbhandler: DBHandler, dbthandler: DBTHandler):
     dbhandler.create_fpl_db_schema()
     dbhandler.setup_raw_tables()
     dbhandler.update_raw()
+    dbthandler.run_dbt_snapshot()
     dbthandler.run_dbt_models()
     dbthandler.run_dbt_tests()
 
 
 def run_dbt(dbthandler: DBTHandler):
+    dbthandler.run_dbt_snapshot()
     dbthandler.run_dbt_models()
     dbthandler.run_dbt_tests()
 
 
-def update_raw(dbhandler: DBHandler, dbthandler: DBTHandler):
+def update_raw(dbhandler: DBHandler):
     dbhandler.create_fpl_db_schema()
     dbhandler.setup_raw_tables()
     dbhandler.update_raw()

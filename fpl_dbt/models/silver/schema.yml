@@ -485,40 +485,6 @@ models:
                 field: id
                 to: ref('silver_teams')
 
-  - name: silver_players_fixtures
-    description: "Cleaned and indexed players fixtures data."
-    columns:
-      - name: element
-        data_tests:
-          - relationships:
-              arguments:
-                field: id
-                to: ref('silver_players')
-      - name: id
-        data_tests:
-          - relationships:
-              arguments:
-                field: id
-                to: ref('silver_fixtures')
-      - name: team_h
-        data_tests:
-          - relationships:
-              arguments:
-                field: id
-                to: ref('silver_teams')
-      - name: team_a
-        data_tests:
-          - relationships:
-              arguments:
-                field: id
-                to: ref('silver_teams')
-      - name: event
-        data_tests:
-          - relationships:
-              arguments:
-                field: id
-                to: ref('silver_events')
-
   - name: silver_points_explain
     description: "Cleaned and indexed points explain data."
     columns:

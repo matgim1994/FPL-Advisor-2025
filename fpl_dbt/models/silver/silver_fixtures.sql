@@ -19,7 +19,7 @@ with source_data as (
         team_h_score,
         team_h_difficulty,
         team_a_difficulty
-    from {{ ref('bronze_fixtures') }}
+    from {{ ref('fixtures_snapshot') }}
 )
 
 select *

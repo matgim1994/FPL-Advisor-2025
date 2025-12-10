@@ -17,7 +17,7 @@ with future_fixtures as (
             when f.team_h = t.id then f.team_h_difficulty
             else f.team_a_difficulty
         end as difficulty
-    from {{ ref('bronze_teams') }} as t
+    from {{ ref('teams_snapshot') }} as t
     cross join lateral
         (
             select
@@ -28,7 +28,7 @@ with future_fixtures as (
                 team_h_difficulty,
                 team_a_difficulty
             from
-                {{ ref('bronze_fixtures') }}
+                {{ ref('fixtures_snapshot') }}
             where
                 finished is not true
                 and started is not true

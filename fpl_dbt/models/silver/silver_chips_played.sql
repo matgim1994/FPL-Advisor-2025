@@ -12,7 +12,7 @@ with source_data as (
     (chip_plays->1->'num_played')::INT as freehit,
     (chip_plays->2->'num_played')::INT as wildcard,
     (chip_plays->3->'num_played')::INT as triple_cpt
-    from {{ ref('bronze_events') }}
+    from {{ ref('events_snapshot') }}
     order by event   
 )
 
