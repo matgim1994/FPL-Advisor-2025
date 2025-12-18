@@ -20,6 +20,7 @@ with source_data as (
         team_h_difficulty,
         team_a_difficulty
     from {{ ref('fixtures_snapshot') }}
+    where dbt_valid_to is null
 )
 
 select *

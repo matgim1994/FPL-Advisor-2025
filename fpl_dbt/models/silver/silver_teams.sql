@@ -21,6 +21,7 @@ with source_data as (
         strength_defence_away,
         pulse_id
     from {{ ref('teams_snapshot') }}
+    where dbt_valid_to is null
 )
 
 select *

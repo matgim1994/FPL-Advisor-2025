@@ -13,6 +13,7 @@ with source_data as (
     (chip_plays->2->'num_played')::INT as wildcard,
     (chip_plays->3->'num_played')::INT as triple_cpt
     from {{ ref('events_snapshot') }}
+    where dbt_valid_to is null
     order by event   
 )
 

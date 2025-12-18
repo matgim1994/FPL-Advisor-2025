@@ -50,6 +50,7 @@ with source_data as (
         transfers_in,
         transfers_out
     from {{ ref('players_history_snapshot') }}
+    where dbt_valid_from is null
 )
 
 select *

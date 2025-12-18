@@ -15,6 +15,7 @@ with source_data as (
         most_captained,
         most_vice_captained
     from {{ ref('events_snapshot') }}
+    where dbt_valid_to is null
 )
 
 select *
