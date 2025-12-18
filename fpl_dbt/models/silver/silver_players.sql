@@ -96,6 +96,7 @@ with source_data as (
         defensive_contribution_per_90
     from {{ ref('elements_snapshot') }}
     where can_select is True or can_transact is True
+    and dbt_valid_to is null
 )
 
 select *

@@ -30,12 +30,14 @@ with future_fixtures as (
             from
                 {{ ref('fixtures_snapshot') }}
             where
-                finished is not true
+                dbt_valid_to is null
+                and finished is not true
                 and started is not true
                 and (team_h = t.id or team_a = t.id)
             order by event asc
             limit 5
         ) as f
+    where t.dbt_valid_to is null
 )
 
 SELECT

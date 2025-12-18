@@ -15,6 +15,7 @@ with source_data as (
         value,
         points_modification
     from {{ ref('points_explain_snapshot') }}
+    where dbt_valid_to is null
 )
 
 select *

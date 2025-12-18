@@ -27,6 +27,7 @@ with source_data as (
         ranked_count,
         transfers_made
     from {{ ref('events_snapshot') }}
+    where dbt_valid_to is null
 )
 
 select *
