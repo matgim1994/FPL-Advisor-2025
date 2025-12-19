@@ -27,12 +27,19 @@ class DBHandler:
     def update_raw(self) -> None:
         """Function runs all of the upload methods that update raw schema."""
 
+        if not self._pg_conn:
+            self._pg_conn = self._setup_connection()
+
         self.update_teams()
         self.update_elements()
         self.update_events()
         self.update_fixtures()
         self.update_players_history()
         self.update_points_explain()
+
+        if self._pg_conn:
+            self._pg_conn.close()
+            self._pg_conn = None
 
     def _setup_connection(self):
         conn = psycopg2.connect(
