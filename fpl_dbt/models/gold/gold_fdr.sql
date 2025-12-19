@@ -1,3 +1,7 @@
+{{ config(
+    alias='fdr'
+ )}}
+
 with source_data as (
     select
         *
