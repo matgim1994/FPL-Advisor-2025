@@ -17,3 +17,4 @@ select
     strength_defence_away,
     pulse_id
 from {{ ref('silver_teams') }}
+order by id asc

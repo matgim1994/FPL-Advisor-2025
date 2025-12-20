@@ -10,3 +10,4 @@ select
     value,
     points_modification
 from {{ ref('silver_points_explain') }}
+order by id asc

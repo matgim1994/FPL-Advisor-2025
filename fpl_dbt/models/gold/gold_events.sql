@@ -23,3 +23,4 @@ select
     ranked_count,
     transfers_made
 from {{ ref('silver_events') }}
+order by id asc
