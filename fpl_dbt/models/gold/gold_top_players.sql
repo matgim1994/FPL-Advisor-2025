@@ -11,3 +11,4 @@ select
     most_captained,
     most_vice_captained
 from {{ ref('silver_top_players') }}
+order by event asc

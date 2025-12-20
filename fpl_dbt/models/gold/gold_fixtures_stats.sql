@@ -11,3 +11,4 @@ select
     value,
     side
 from {{ ref('silver_fixtures_stats') }}
+order by fixture, event, element asc

@@ -4,7 +4,7 @@ import os
 import sys
 import logging
 from src.CONSTANS import (
-    LOGS_FOLDER_NAME, DBHANDLER_LOGS_FOLDER_NAME
+    LOGS_FOLDER_NAME, DBHANDLER_LOGS_FOLDER_NAME, API_LOGS_FOLDER_NAME
 )
 
 
@@ -38,6 +38,13 @@ def setup_dbhandler_logger() -> None:
 
     logs_folder_path = os.path.join(LOGS_FOLDER_NAME, DBHANDLER_LOGS_FOLDER_NAME)
     _setup_logger(logger_name='db_handler', logs_folder_path=logs_folder_path)
+
+
+def setup_api_logger() -> None:
+    """Method used to setup api logger."""
+
+    logs_folder_path = os.path.join(LOGS_FOLDER_NAME, API_LOGS_FOLDER_NAME)
+    _setup_logger(logger_name='api', logs_folder_path=logs_folder_path)
 
 
 def setup_first_setup_logger() -> None:
