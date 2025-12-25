@@ -77,11 +77,11 @@ select
     p.direct_freekicks_order,
     p.penalties_order,
     p.expected_goals_per_90 as "xG90",
-    p.saves_per_90,
+    p.saves_per_90 as "Saves90",
     p.expected_assists_per_90 as "xA90",
     p.expected_goal_involvements_per_90 as "xGI90",
     p.expected_goals_conceded_per_90 as "xGC90",
-    p.goals_conceded_per_90,
+    p.goals_conceded_per_90 as "GC90",
     p.now_cost_rank,
     p.now_cost_rank_type,
     p.form_rank,
@@ -90,8 +90,8 @@ select
     p.selected_rank,
     p.selected_rank_type,
     p.starts_per_90,
-    p.clean_sheets_per_90,
-    p.defensive_contribution_per_90
+    p.clean_sheets_per_90 as "CS90",
+    p.defensive_contribution_per_90 as "DC90"
 from {{ ref('silver_players') }} p
 join {{ ref('silver_teams') }} t on t.id = team
 order by p.id asc
