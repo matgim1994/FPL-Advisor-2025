@@ -5,7 +5,7 @@
 select
 	fm.id,
 	fm.event,
-	fm.kickoff_time,
+	fm.kickoff_time as "Kickoff Time",
 	th.name as "Team Home",
 	ta.name as "Team Away",
 	fm.team_h_score "Team Home Score",
