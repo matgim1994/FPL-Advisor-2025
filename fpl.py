@@ -4,7 +4,7 @@ from src.db_handlers.dbt_handler import DBTHandler
 from src.pg_config import get_pg_config
 
 
-def first_setup(dbhandler: DBHandler, dbthandler: DBTHandler):
+def update(dbhandler: DBHandler, dbthandler: DBTHandler):
     dbhandler.create_fpl_db_schema()
     dbhandler.setup_raw_tables()
     dbhandler.update_raw()
@@ -60,15 +60,17 @@ def main():
     )
 
     parser.add_argument(
-        '-fs',
-        '--first-setup',
+        '-u',
+        '--update',
         action='store_true',
         help="""Use this flag to setup raw schema in your db,
                 create all necessary raw tables to fetch API data,
                 collect all the data from API, run dbt to
                 transform fetched data to bronze, silver and gold layers,
                 and in the end run dbt test to check if all constrainst are met.
-                Takes about 6 minutes."""
+                If you already have your raw tables setup, this command will
+                just update the raw tables with fresh data from the API,
+                and then run dbt transformations and tests."""
     )
 
     parser.add_argument(
@@ -93,8 +95,8 @@ def main():
     )
     args = parser.parse_args()
 
-    if args.first_setup:
-        first_setup(dbhandler=dbhandler, dbthandler=dbthandler)
+    if args.update:
+        update(dbhandler=dbhandler, dbthandler=dbthandler)
     elif args.update_raw:
         dbhandler.update_raw()
     elif args.run_dbt:
