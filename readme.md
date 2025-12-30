@@ -38,11 +38,12 @@ Follow these steps to set up the project locally:
     ```
     This command starts the PostgreSQL container, making the database accessible.
 
-5.  **Run First Setup:**
+5.  **Run Update:**
     ```bash
-    python3 fpl.py -fs
+    python3 fpl.py -u
     ```
     This command performs the initial setup, including fetching the latest full data batch from the FPL API and running the initial data transformation.
+    Later, when all necessary database objects are created, you can use it as main data update function.
     
 ## ⚡️ Application Usage and Commands
 
