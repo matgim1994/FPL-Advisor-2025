@@ -8,8 +8,6 @@
 
 * **Docker:** Used for containerizing the PostgreSQL database instance.
 * **Python (3.11.2 or newer)**
-* **Linux Environment**
-* **DBeaver (or similar)**
 
 ## ⚙️ Installation Guide
 
@@ -55,7 +53,7 @@ All operations are executed via the main script, `fpl.py`. Use the help command 
 | Command | Description |
 | :--- | :--- |
 | `python3 fpl.py -h` | Displays **help documentation** and all available CLI arguments. |
-| `python3 fpl.py -fs` | **First Setup.** Performs initial database creation, data ingestion, and full transformation. **Run once after installation.** |
+| `python3 fpl.py -u` | **Update** Performs initial database creation, raw data ingestion, and full transformation. |
 | `python3 fpl.py -ur` | **Update Raw Data.** Downloads a new, complete batch of raw data from the FPL API. The application includes the script run date in the `ingestion_time` column for tracking and auditability. |
 | `python3 fpl.py -rd` | **Run Data Transformations.** Executes the dbt models, updating data across the `bronze`, `silver`, and `gold` schemas. This step also runs **data quality tests** defined within dbt against the transformed data. |
 
@@ -66,8 +64,8 @@ The database implements a robust data architecture, separating data into distinc
 | Schema | Description | Purpose & Tools |
 | :--- | :--- | :--- |
 | `raw` | Core data fetched directly from the FPL API. Data is **validated by Pydantic** upon ingestion to ensure structural integrity and prevent schema drift. | **Landing Zone**  |
-| `bronze` | Newest data loaded from the `raw` schema. Data is validated but there are no major transormations at this stage. | **Standardized Data**|
-| `silver` | Cleaned, structured, and integrated data. | **Data Integration** |
+| `bronze` | Newest data loaded from the `raw` schema. Data is validated but there are no major transormations at this stage. Data is stored as SCD2 using dbt snapshots.| **Standardized Data**|
+| `silver` | Cleaned, structured, and integrated data. Raw data is organized into new objects prepared for later transformations into gold schema. | **Data Integration** |
 | `gold` | Final, application-ready data. Contains aggregated tables and calculated metrics optimized for BI reporting and custom application features. | **App Ready Data** |
 
 ## 🏗️ dbt
@@ -94,11 +92,11 @@ As FPL Advisor is under active development, there are several key features plann
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Django REST API** | Implementing a production-ready REST API using Django to serve data from the `gold` schema. | In Progress |
+| **API** | Implementing a production-ready API using FastAPI to serve data from the `gold` schema. | In Progress |
 | **Gold Layer Enrichment** | Extracting further analytical insights from the `silver` layer. | In Progress |
-| **Automated Scheduling** | Implementing workflow orchestration using Airflow to automate the `-ur` and `-rd` commands. | In Progress |
-| **Web Interface (BI)** | Development of a lightweight web interface for easy data visualization and recomendations. | Planned |
-| **External Data Sources** | Integrating secondary data sources (e.g., injuries, betting odds) to enrich the `silver` layer. | Planned |
+| **Automated Scheduling** | Implementing orchestration using Airflow to automate the data flow. | Planned |
+| **Web Interface** | Development of a lightweight web interface for easy data visualization and recomendations. | Planned |
+| **External Data Sources** | Integrating secondary data sources (e.g., shots on target, final third touches) to enrich official FPL data. | Planned |
 
 ## 🚨 Known Issues
 
@@ -107,17 +105,15 @@ Before opening a new issue, please check the following list of known problems:
 * **Issue:** The `silver` layer contains significantly more data/tables than the `gold` layer.
     * **Answer:** This is intentional at the current stage. The `gold` layer enrichment is an ongoing process. Please refer to the **Roadmap** section for planned updates.
 * **Issue:** There is no API to query the data directly.
-    * **Answer:** Implementing a REST API is the next major feature planned for development. See the **Roadmap** section for the status of the **Django REST API** integration.
+    * **Answer:** Implementing a REST API is the next major feature planned for development. See the **Roadmap** section for the status of the **API** integration.
 * **Issue:** Application logs are stored separately from dbt logs.
     * **Answer:** I'm still looking for a best solution for logging in this app.
-* **Issue:** Why are full raw data batches retained, and why aren't dbt snapshots or SCD2  used for managing raw data?
-    * **Answer:** This application is currently in the development phase. The raw data extraction system is scheduled to be refactored in a future major update to utilize dbt snapshots and SCD2, which will address data duplication and versioning more efficiently.
 
 ## 📜 License and Contact
 
 ### License
 
-To be considered...
+This project is licensed under the GPL v3 License.
 
 ### Contact
 
