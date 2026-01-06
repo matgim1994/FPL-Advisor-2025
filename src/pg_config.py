@@ -12,6 +12,6 @@ def get_pg_config():
         dbname=os.getenv("FPL_PG_DB"),
         user=os.getenv("FPL_PG_USER"),
         password=os.getenv("FPL_PG_PASS"),
-        port=os.getenv("FPL_PG_PORT")
+        port=os.getenv("FPL_PG_PORT_INTERNAL")
     )
     return pgconfig

@@ -53,7 +53,7 @@ def main():
         description=(
             """This is a CLI for backend of the FPL Advisor app.
             You can use it to setup your db, update it, prune old data,
-            run Django REST API or even schedule db updates for the future.
+            run API or even schedule db updates for the future.
             Checkout possible actions in the description below."""
         ),
         formatter_class=argparse.RawTextHelpFormatter

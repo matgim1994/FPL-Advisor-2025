@@ -1,17 +1,95 @@
 services:
+  # Main FPL Database Service (Production-ready with external volumes)
   db:
     image: postgres:17
-    container_name: postgres_db
+    container_name: fpl_db_${FPL_ENV}
     restart: always
     environment:
       POSTGRES_USER: ${FPL_PG_USER}
       POSTGRES_PASSWORD: ${FPL_PG_PASS}
       POSTGRES_DB: ${FPL_PG_DB}
     ports:
-      - "7651:5432"
+      - "${FPL_PG_PORT_EXTERNAL}:5432"
     volumes:
-      - fpl-data:/var/lib/postgresql/data
+      - fpl_data_${FPL_ENV}:/var/lib/postgresql/data
+    networks:
+      - fpl-network
+
+  # Airflow Metadata Database Service
+  airflow_db:
+    image: postgres:17
+    container_name: airflow_db_metadata_${FPL_ENV}
+    restart: always
+    environment:
+      POSTGRES_USER: ${FPL_AIRFLOW_PG_USER}
+      POSTGRES_PASSWORD: ${FPL_AIRFLOW_PG_PASS}
+      POSTGRES_DB: ${FPL_AIRFLOW_PG_DB}
+    volumes:
+      - airflow_metadata_${FPL_ENV}:/var/lib/postgresql/data
+    networks:
+      - fpl-network
+
+  # Airflow API Server (Old Webserver in AF3)
+  airflow_webserver:
+    build: .
+    container_name: airflow_webserver_${FPL_ENV}
+    restart: always
+    depends_on:
+      - airflow_db
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${FPL_AIRFLOW_PG_USER}:${FPL_AIRFLOW_PG_PASS}@airflow_db/${FPL_AIRFLOW_PG_DB}
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__AUTH_MANAGER=airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+      - _AIRFLOW_DB_MIGRATE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=${FPL_AIRFLOW_UI_ADMIN_USER}
+      - _AIRFLOW_WWW_USER_PASSWORD=${FPL_AIRFLOW_UI_ADMIN_PASS}
+      - _AIRFLOW_WWW_USER_EMAIL=${FPL_AIRFLOW_UI_ADMIN_EMAIL}
+      - _AIRFLOW_WWW_USER_ROLE=Admin
+      - _AIRFLOW_WWW_USER_FIRSTNAME=FPL
+      - _AIRFLOW_WWW_USER_LASTNAME=Admin
+    ports:
+      - "${FPL_AIRFLOW_PORT}:8080"
+    command: api-server
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./fpl_dbt:/opt/airflow/fpl_dbt
+      - ./src:/opt/airflow/src
+    networks:
+      - fpl-network
+
+  # Airflow Scheduler Service
+  airflow_scheduler:
+    build: .
+    container_name: airflow_scheduler_${FPL_ENV}
+    restart: always
+    depends_on:
+      - airflow_db
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${FPL_AIRFLOW_PG_USER}:${FPL_AIRFLOW_PG_PASS}@airflow_db/${FPL_AIRFLOW_PG_DB}
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - FPL_ENV=${FPL_ENV}
+      - _AIRFLOW_DB_UPGRADE=true
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./fpl_dbt:/opt/airflow/fpl_dbt
+      - ./src:/opt/airflow/src
+    command: scheduler
+    networks:
+      - fpl-network
+
+networks:
+  fpl-network:
+    driver: bridge
 
 volumes:
-  fpl-data:
+  fpl_data_dev:
+    external: true
+  fpl_data_prod:
+    external: true
+  airflow_metadata_dev:
+    external: true
+  airflow_metadata_prod:
     external: true
