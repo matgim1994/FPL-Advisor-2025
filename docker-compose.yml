@@ -3,6 +3,7 @@ x-airflow-common:
   build: .
   environment:
     &airflow-common-env
+    FPL_PG_HOST: db
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${FPL_AIRFLOW_PG_USER}:${FPL_AIRFLOW_PG_PASS}@airflow_db/${FPL_AIRFLOW_PG_DB}
@@ -44,6 +45,7 @@ services:
   # Airflow Metadata Database Service
   airflow_db:
     image: postgres:16
+    container_name: airflow_db_${FPL_ENV}
     environment:
       POSTGRES_USER: ${FPL_AIRFLOW_PG_USER}
       POSTGRES_PASSWORD: ${FPL_AIRFLOW_PG_PASS}
@@ -60,6 +62,7 @@ services:
   airflow-apiserver:
     <<: *airflow-common
     command: api-server
+    container_name: airflow_apiserver_${FPL_ENV}
     ports:
       - "8080:8080"
     healthcheck:
@@ -77,6 +80,7 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
+    container_name: airflow_scheduler_${FPL_ENV}
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
@@ -92,6 +96,7 @@ services:
   airflow-dag-processor:
     <<: *airflow-common
     command: dag-processor
+    container_name: airflow_dag_processor_${FPL_ENV}
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
       interval: 30s

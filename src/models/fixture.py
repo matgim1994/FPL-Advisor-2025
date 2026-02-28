@@ -17,14 +17,14 @@ class Stat(BaseModel):
 
 class Fixture(BaseModel):
     code: int
-    event: int
+    event: Optional[int]
     finished: bool
     finished_provisional: bool
     id: int
-    kickoff_time: datetime
+    kickoff_time: Optional[datetime]
     minutes: int
     provisional_start_time: bool
-    started: bool
+    started: Optional[bool]
     team_a: int
     team_a_score: Optional[int]
     team_h: int
