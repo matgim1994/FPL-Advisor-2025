@@ -19,6 +19,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}:/opt/project
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -58,6 +59,8 @@ services:
       retries: 5
       start_period: 5s
     restart: always
+    networks:
+      - fpl-network
 
   airflow-apiserver:
     <<: *airflow-common
@@ -76,6 +79,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - fpl-network
 
   airflow-scheduler:
     <<: *airflow-common
@@ -92,6 +97,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - fpl-network
 
   airflow-dag-processor:
     <<: *airflow-common
@@ -108,6 +115,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - fpl-network
 
   airflow-init:
     <<: *airflow-common
@@ -202,6 +211,8 @@ services:
       _AIRFLOW_WWW_USER_PASSWORD: ${FPL_AIRFLOW_UI_ADMIN_PASS}
       _PIP_ADDITIONAL_REQUIREMENTS: ''
     user: "0:0"
+    networks:
+      - fpl-network
   
   airflow-cli:
     <<: *airflow-common
@@ -216,6 +227,8 @@ services:
       - airflow
     depends_on:
       <<: *airflow-common-depends-on
+    networks:
+      - fpl-network
 
 networks:
   fpl-network:
