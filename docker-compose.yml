@@ -4,6 +4,7 @@ x-airflow-common:
   environment:
     &airflow-common-env
     FPL_PG_HOST: db
+    PROJECT_ROOT: /opt/project
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${FPL_AIRFLOW_PG_USER}:${FPL_AIRFLOW_PG_PASS}@airflow_db/${FPL_AIRFLOW_PG_DB}

@@ -7,7 +7,7 @@ from airflow.operators.python import PythonOperator
 
 def full_update():
     subprocess.run(
-        ["python", "/opt/project/fpl.py", "-u"],
+        ["python", "/opt/project/fpl.py", "-ur"],
         check=True
     )
 
