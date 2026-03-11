@@ -1,0 +1,21 @@
+fpl_dbt:
+  target: "{{ env_var('FPL_ENV', 'dev') }}"
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('FPL_PG_HOST') }}"
+      user: "{{ env_var('FPL_PG_USER') }}"
+      password: "{{ env_var('FPL_PG_PASS') }}"
+      port: "{{ env_var('FPL_PG_PORT') | int }}"
+      dbname: "{{ env_var('FPL_PG_DB') }}"
+      schema: public
+      threads: 4
+    prod:
+      type: postgres
+      host: "{{ env_var('FPL_PG_HOST') }}"
+      user: "{{ env_var('FPL_PG_USER') }}"
+      password: "{{ env_var('FPL_PG_PASS') }}"
+      port: "{{ env_var('FPL_PG_PORT') | int }}"
+      dbname: "{{ env_var('FPL_PG_DB') }}"
+      schema: public
+      threads: 4

@@ -13,19 +13,19 @@ class DBTHandler(DBHandler):
         """Function runs dbt snapshot command."""
 
         self._logger.info("Running dbt snapshot command...")
-        self._execute_command(['dbt', 'snapshot', '--project-dir', self.dbt_path])
+        self._execute_command(['dbt', 'snapshot', '--project-dir', self.dbt_path, '--profiles-dir', self.dbt_path])
 
     def run_dbt_models(self):
         """Function runs dbt run command."""
 
         self._logger.info("Running dbt run command...")
-        self._execute_command(['dbt', 'run', '--project-dir', self.dbt_path])
+        self._execute_command(['dbt', 'run', '--project-dir', self.dbt_path, '--profiles-dir', self.dbt_path])
 
     def run_dbt_tests(self):
         """Function runs dbt tests..."""
 
         self._logger.info("Running dbt tests...")
-        self._execute_command(['dbt', 'test', '--project-dir', self.dbt_path])
+        self._execute_command(['dbt', 'test', '--project-dir', self.dbt_path, '--profiles-dir', self.dbt_path])
 
     def _execute_command(self, command_parts: list[str]) -> None:
         """Function used to run terminal commands via python.
