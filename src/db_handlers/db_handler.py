@@ -13,7 +13,7 @@ from src.models.player_history import PlayerHistory
 from src.models.player_upcoming_fixtures import PlayerFixtures
 from src.models.points_explain import PointsExplain
 from src.logger import get_logger, setup_dbhandler_logger
-from src.CONSTANS import MAIN_API, FIXTURES_API, PLAYER_API, PERFORMANCE_GW_API
+from src.CONSTANS import MAIN_API, FIXTURES_API, PLAYER_API, PERFORMANCE_GW_API, PROJECT_ROOT
 
 
 class DBHandler:
@@ -509,8 +509,8 @@ class DBHandler:
 
         self._logger.info("Starting creating fresh raw tables...")
 
-        for filename in os.listdir("./src/db_handlers/sql/raw_tables"):
-            self._execute_sql_script(filepath=f'./src/db_handlers/sql/raw_tables/{filename}')
+        for filename in os.listdir(f"{PROJECT_ROOT}/src/db_handlers/sql/raw_tables"):
+            self._execute_sql_script(filepath=f'{PROJECT_ROOT}/src/db_handlers/sql/raw_tables/{filename}')
 
         self._logger.info("Raw tables created successfully.")
 

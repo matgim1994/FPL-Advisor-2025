@@ -25,35 +25,13 @@ def update_raw(dbhandler: DBHandler):
     dbhandler.update_raw()
 
 
-def create_dotenv():
-    fpl_pg_user = input('Your postgres master user name: ')
-    fpl_pg_password = input('Your postgres master user password: ')
-    fpl_pg_db = input('Your database name: ')
-    fpl_pg_host = input('Your db host (write localhost if working locally): ')
-    fpl_pg_port = input('Your database port: ')
-
-    env_vars = {
-        "FPL_PG_USER": fpl_pg_user,
-        "FPL_PG_PASS": fpl_pg_password,
-        "FPL_PG_DB": fpl_pg_db,
-        "FPL_PG_HOST": fpl_pg_host,
-        "FPL_PG_PORT": fpl_pg_port,
-    }
-
-    with open("./.env", "w") as file:
-        file.write("\n".join(f"{k}={v.strip()}" for k, v in env_vars.items()))
-
-
 def main():
-    pgconfig = get_pg_config()
-    dbhandler = DBHandler(pgconfig=pgconfig)
-    dbthandler = DBTHandler()
 
     parser = argparse.ArgumentParser(
         description=(
             """This is a CLI for backend of the FPL Advisor app.
             You can use it to setup your db, update it, prune old data,
-            run Django REST API or even schedule db updates for the future.
+            run API or even schedule db updates for the future.
             Checkout possible actions in the description below."""
         ),
         formatter_class=argparse.RawTextHelpFormatter
@@ -95,14 +73,16 @@ def main():
     )
     args = parser.parse_args()
 
+    pgconfig = get_pg_config()
+    dbhandler = DBHandler(pgconfig=pgconfig)
+    dbthandler = DBTHandler()
+
     if args.update:
         update(dbhandler=dbhandler, dbthandler=dbthandler)
     elif args.update_raw:
         dbhandler.update_raw()
     elif args.run_dbt:
         run_dbt(dbthandler=dbthandler)
-    elif args.create_dotenv:
-        create_dotenv()
     else:
         print("Script used without specified command. Run -h to checkout possibilities.")
 
