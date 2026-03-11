@@ -1,4 +1,5 @@
 import argparse
+import psycopg2
 from src.db_handlers.db_handler import DBHandler
 from src.db_handlers.dbt_handler import DBTHandler
 from src.pg_config import get_pg_config
@@ -65,26 +66,30 @@ def main():
         help="Use this flag to run dbt transformations and tests."
     )
 
-    parser.add_argument(
-        '-cd',
-        '--create-dotenv',
-        action='store_true',
-        help="Use this flag to create dotenv file with postgres credentials."
-    )
     args = parser.parse_args()
 
     pgconfig = get_pg_config()
-    dbhandler = DBHandler(pgconfig=pgconfig)
+    conn = psycopg2.connect(
+        host=pgconfig.host,
+        dbname=pgconfig.dbname,
+        user=pgconfig.user,
+        password=pgconfig.password,
+        port=pgconfig.port
+    )
     dbthandler = DBTHandler()
 
-    if args.update:
-        update(dbhandler=dbhandler, dbthandler=dbthandler)
-    elif args.update_raw:
-        dbhandler.update_raw()
-    elif args.run_dbt:
-        run_dbt(dbthandler=dbthandler)
-    else:
-        print("Script used without specified command. Run -h to checkout possibilities.")
+    try:
+        dbhandler = DBHandler(pg_conn=conn)
+        if args.update:
+            update(dbhandler=dbhandler, dbthandler=dbthandler)
+        elif args.update_raw:
+            dbhandler.update_raw()
+        elif args.run_dbt:
+            run_dbt(dbthandler=dbthandler)
+        else:
+            print("Script used without specified command. Run -h to checkout possibilities.")
+    finally:
+        conn.close()
 
 
 if __name__ == '__main__':

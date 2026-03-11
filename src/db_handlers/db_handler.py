@@ -1,10 +1,8 @@
-import psycopg2
 import requests
 import json
 import os
 import hashlib
 from datetime import datetime, timezone
-from src.models.pg_config import PGConfig
 from src.models.event import Event
 from src.models.element import Element
 from src.models.team import Team
@@ -18,17 +16,13 @@ from src.CONSTANS import MAIN_API, FIXTURES_API, PLAYER_API, PERFORMANCE_GW_API,
 
 class DBHandler:
 
-    def __init__(self, pgconfig: PGConfig):
+    def __init__(self, pg_conn):
         setup_dbhandler_logger()
         self._logger = get_logger(logger_name='db_handler')
-        self._pg_config = pgconfig
-        self._pg_conn = self._setup_connection()
+        self._pg_conn = pg_conn
 
     def update_raw(self) -> None:
         """Function runs all of the upload methods that update raw schema."""
-
-        if not self._pg_conn:
-            self._pg_conn = self._setup_connection()
 
         self.update_teams()
         self.update_elements()
@@ -36,20 +30,6 @@ class DBHandler:
         self.update_fixtures()
         self.update_players_history()
         self.update_points_explain()
-
-        if self._pg_conn:
-            self._pg_conn.close()
-            self._pg_conn = None
-
-    def _setup_connection(self):
-        conn = psycopg2.connect(
-            host=self._pg_config.host,
-            dbname=self._pg_config.dbname,
-            user=self._pg_config.user,
-            password=self._pg_config.password,
-            port=self._pg_config.port
-        )
-        return conn
 
     def _api_call(self, api: str):
         """Function makes an api call to given url.
@@ -70,7 +50,6 @@ class DBHandler:
             return api_result
         except Exception as e:
             self._logger.error(f'Error occured during api call: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
     def _api_session(self) -> requests.sessions.Session:
@@ -88,7 +67,6 @@ class DBHandler:
             return session
         except Exception as e:
             self._logger.error(f'Error occured during api session creation: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
     def _serialize_arrays(self, record: dict) -> list:
@@ -126,7 +104,6 @@ class DBHandler:
             self._logger.info('Events fields are correct.')
         except Exception as e:
             self._logger.error(f'An error occured during events fields validation: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
         self._upsert_raw_data(schema='raw', table_name='events', records=events, columns=columns,
@@ -152,7 +129,6 @@ class DBHandler:
             self._logger.info('Elements fields are correct.')
         except Exception as e:
             self._logger.error(f'An error occured during elements fields validation: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
         self._upsert_raw_data(schema='raw', table_name='elements', records=elements, columns=columns,
@@ -178,7 +154,6 @@ class DBHandler:
             self._logger.info('Teams fields are correct.')
         except Exception as e:
             self._logger.error(f'An error occured during teams fields validation: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
         self._upsert_raw_data(schema='raw', table_name='teams', records=teams, columns=columns,
@@ -204,7 +179,6 @@ class DBHandler:
             self._logger.info('Teams fields are correct.')
         except Exception as e:
             self._logger.error(f'An error occured during teams fields validation: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
         self._upsert_raw_data(schema='raw', table_name='fixtures', records=fixtures, columns=columns,
@@ -238,7 +212,6 @@ class DBHandler:
             except Exception as e:
                 self._logger.error(f'An error occured during player {player_id} ' +
                                    f'history fields validation: {e}. Raising error.')
-                self._pg_conn.close()
                 raise e
 
         self._upsert_raw_data(schema='raw', table_name='players_history', records=records, columns=columns,
@@ -269,7 +242,6 @@ class DBHandler:
             except Exception as e:
                 self._logger.error(f'An error occured during player {player_id} ' +
                                    f'upcoming fixtures fields validation: {e}. Raising error.')
-                self._pg_conn.close()
                 raise e
 
             self._upload_raw_data(schema='raw', table_name='players_fixtures',
@@ -308,7 +280,6 @@ class DBHandler:
                 except Exception as e:
                     self._logger.error(f"An error occured during points explain for {stat['id']} " +
                                        f"in fixture {stat['fixture']} fields validation: {e}. Raising error.")
-                    self._pg_conn.close()
                     raise e
 
         self._upsert_raw_data(schema='raw', table_name='points_explain', records=records, columns=columns,
@@ -349,7 +320,6 @@ class DBHandler:
             self._logger.info(f'Data ingested to {schema}.{table_name} table successfully.')
         except Exception as e:
             self._logger.info(f'An error occured during data ingestion to {schema}.{table_name}: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
     def _upsert_raw_data(self, schema: str, table_name: str, records: list, columns: list,
@@ -400,7 +370,6 @@ class DBHandler:
                               f'{cursor.rowcount} rows affected.')
         except Exception as e:
             self._logger.info(f'An error occured during {schema}.{table_name} upsert: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
     def _get_players_ids(self) -> list[int]:
@@ -427,7 +396,6 @@ class DBHandler:
             return players_ids
         except Exception as e:
             self._logger.info(f'An error occured during selecting player ids: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
     def _get_started_events(self) -> list[int]:
@@ -449,7 +417,6 @@ class DBHandler:
             return gw_ids
         except Exception as e:
             self._logger.info(f'An error occured during selecting gw ids: {e}. Raising error.')
-            self._pg_conn.close()
             raise e
 
     def _execute_sql_script(self, filepath: str) -> None:
@@ -478,7 +445,6 @@ class DBHandler:
         except Exception as e:
             self._logger.error("An error occured during execution of SQL command: " +
                                f"{e}. Raising error.")
-            self._pg_conn.close()
             raise e
 
     def _compute_hash(self, record: dict, hash_columns: list) -> hashlib.sha256:
