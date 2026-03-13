@@ -44,9 +44,7 @@ class DBHandler:
             Exception: in case of an error during api call"""
 
         try:
-            self._logger.info('Starting API call...')
             api_result = requests.get(api).json()
-            self._logger.info('API call returned corectly.')
             return api_result
         except Exception as e:
             self._logger.error(f'Error occured during api call: {e}. Raising error.')
@@ -61,7 +59,6 @@ class DBHandler:
             Exception: when there is an error with session creation."""
 
         try:
-            self._logger.info('Creating API session.')
             session = requests.Session()
             session.headers.update({'User-Agent': 'FPL2025'})
             return session
@@ -99,9 +96,7 @@ class DBHandler:
         api_result = self._api_call(MAIN_API)
 
         try:
-            self._logger.info('Validating events fields returned by API...')
             events = [Event.model_validate(event) for event in api_result['events']]
-            self._logger.info('Events fields are correct.')
         except Exception as e:
             self._logger.error(f'An error occured during events fields validation: {e}. Raising error.')
             raise e
@@ -124,9 +119,7 @@ class DBHandler:
         api_result = self._api_call(MAIN_API)
 
         try:
-            self._logger.info('Validating elements fields returned by API...')
             elements = [Element.model_validate(element) for element in api_result['elements']]
-            self._logger.info('Elements fields are correct.')
         except Exception as e:
             self._logger.error(f'An error occured during elements fields validation: {e}. Raising error.')
             raise e
@@ -149,9 +142,7 @@ class DBHandler:
         api_result = self._api_call(MAIN_API)
 
         try:
-            self._logger.info('Validating teams fields returned by API...')
             teams = [Team.model_validate(element) for element in api_result['teams']]
-            self._logger.info('Teams fields are correct.')
         except Exception as e:
             self._logger.error(f'An error occured during teams fields validation: {e}. Raising error.')
             raise e
@@ -174,9 +165,7 @@ class DBHandler:
         api_result = self._api_call(FIXTURES_API)
 
         try:
-            self._logger.info('Validating fixtures fields returned by API...')
             fixtures = [Fixture.model_validate(element) for element in api_result]
-            self._logger.info('Teams fields are correct.')
         except Exception as e:
             self._logger.error(f'An error occured during teams fields validation: {e}. Raising error.')
             raise e
@@ -205,15 +194,14 @@ class DBHandler:
             api_result = api_result['history']
 
             try:
-                self._logger.info(f'Validating player {player_id} history fields returned by API...')
                 history = [PlayerHistory.model_validate(element) for element in api_result]
-                self._logger.info(f'Players {player_id} history fields are correct.')
                 records.extend(history)
             except Exception as e:
                 self._logger.error(f'An error occured during player {player_id} ' +
                                    f'history fields validation: {e}. Raising error.')
                 raise e
 
+        self._logger.info(f'raw.players_history: validated {len(records)} records across {len(players_ids)} players.')
         self._upsert_raw_data(schema='raw', table_name='players_history', records=records, columns=columns,
                               hash_columns=hash_columns, primary_keys=primary_keys, ingestion_time=ingestion_time)
 
@@ -271,17 +259,14 @@ class DBHandler:
                     stat['id'] = element['id']
                     stat['fixture'] = element['explain'][0]['fixture']
                 try:
-                    self._logger.info(f"Validating points explain values for player {stat['id']} " +
-                                      f"in fixture {element['explain'][0]['fixture']} returned by API...")
                     explain = [PointsExplain.model_validate(stat) for stat in element['explain'][0]['stats']]
                     records.extend(explain)
-                    self._logger.info(f"Points explain fields for {stat['id']} "
-                                      + f"in fixture {stat['fixture']} are correct.")
                 except Exception as e:
                     self._logger.error(f"An error occured during points explain for {stat['id']} " +
                                        f"in fixture {stat['fixture']} fields validation: {e}. Raising error.")
                     raise e
 
+        self._logger.info(f'raw.points_explain: validated {len(records)} records across {len(gw_ids)} GW(s).')
         self._upsert_raw_data(schema='raw', table_name='points_explain', records=records, columns=columns,
                               hash_columns=hash_columns, primary_keys=primary_keys, ingestion_time=ingestion_time)
 
@@ -301,7 +286,6 @@ class DBHandler:
         """
 
         try:
-            self._logger.info(f'Starting data ingestion to {schema}.{table_name} table...')
             bind_values = []
             for record in records:
                 record.ingestion_time = ingestion_time
@@ -339,7 +323,6 @@ class DBHandler:
             Exception: when there is an issue during data upload
         """
         try:
-            self._logger.info(f'Starting upserting data to {schema}.{table_name} table...')
             bind_values = []
             for record in records:
                 record.ingestion_time = ingestion_time
@@ -381,7 +364,6 @@ class DBHandler:
             Exception: when there is an issue with selecting the data."""
 
         try:
-            self._logger.info('Selecting most up to date list of players ids...')
             sql_select = """select id from raw.elements
                             where ingestion_time =
                                 (select max(ingestion_time)
@@ -390,9 +372,6 @@ class DBHandler:
             with self._pg_conn.cursor() as cursor:
                 cursor.execute(sql_select)
                 players_ids = [result[0] for result in cursor.fetchall()]
-            if len(players_ids) < 746:
-                self._logger.warning("Number of players is lower that 746 (starting ammount). "
-                                     "If necessary check latest players list.")
             return players_ids
         except Exception as e:
             self._logger.info(f'An error occured during selecting player ids: {e}. Raising error.')
@@ -406,7 +385,6 @@ class DBHandler:
         Raises:
             Exception: when there is an issue with selecting the data."""
         try:
-            self._logger.info('Selecting ids of GW that already have started...')
             sql_select = """select id from raw.events
                             where finished is true
                             or is_current is true
@@ -437,11 +415,9 @@ class DBHandler:
                 command = command.strip()
                 if not command:
                     continue
-                self._logger.info(f"Executing {command[:60]} command...")
                 with self._pg_conn.cursor() as cursor:
                     cursor.execute(command)
                     self._pg_conn.commit()
-                self._logger.info("SQL query ran correctly.")
         except Exception as e:
             self._logger.error("An error occured during execution of SQL command: " +
                                f"{e}. Raising error.")

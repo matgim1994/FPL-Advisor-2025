@@ -4,7 +4,7 @@ import os
 import sys
 import logging
 from src.CONSTANS import (
-    LOGS_FOLDER_NAME, DBHANDLER_LOGS_FOLDER_NAME, API_LOGS_FOLDER_NAME
+    LOGS_FOLDER_NAME, DBHANDLER_LOGS_FOLDER_NAME, API_LOGS_FOLDER_NAME, DBT_LOGS_FOLDER_NAME
 )
 
 
@@ -38,6 +38,13 @@ def setup_dbhandler_logger() -> None:
 
     logs_folder_path = os.path.join(LOGS_FOLDER_NAME, DBHANDLER_LOGS_FOLDER_NAME)
     _setup_logger(logger_name='db_handler', logs_folder_path=logs_folder_path)
+
+
+def setup_dbt_logger() -> None:
+    """Method used to setup dbt logger."""
+
+    logs_folder_path = os.path.join(LOGS_FOLDER_NAME, DBT_LOGS_FOLDER_NAME)
+    _setup_logger(logger_name='dbt', logs_folder_path=logs_folder_path)
 
 
 def setup_api_logger() -> None:
@@ -86,9 +93,7 @@ def _setup_logger(logger_name: str, logs_folder_path: str) -> None:
     timezone = pytz.timezone('Europe/Warsaw')
     formatter = TimezoneFormatter(fmt=FORMAT, datefmt="%d-%m-%Y %H:%M:%S", timezone=timezone)
 
-    if not os.path.exists(log_path):
-        with open(log_path, 'w'):
-            pass
+    os.makedirs(logs_folder_path, exist_ok=True)
 
     file_handler = logging.FileHandler(log_path, mode='a')
     file_handler.setFormatter(formatter)
