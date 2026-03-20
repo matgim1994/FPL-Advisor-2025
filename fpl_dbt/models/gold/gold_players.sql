@@ -92,7 +92,9 @@ select
     p.selected_rank_type,
     p.starts_per_90,
     p.clean_sheets_per_90 as "CS90",
-    p.defensive_contribution_per_90 as "DC90"
+    p.defensive_contribution_per_90 as "DC90",
+    case when p.minutes > 0 then round(cast(p.goals_scored as numeric) / p.minutes * 90, 2) else 0 end as "Goals90",
+    case when p.minutes > 0 then round(cast(p.assists as numeric) / p.minutes * 90, 2) else 0 end as "Assists90"
 from {{ ref('silver_players') }} p
 join {{ ref('silver_teams') }} t on t.id = team
 order by p.id asc
