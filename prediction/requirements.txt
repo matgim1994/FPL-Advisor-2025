@@ -1,0 +1,10 @@
+scikit-learn
+xgboost
+shap
+joblib
+jupyter
+matplotlib
+seaborn
+pandas
+sqlalchemy
+psycopg2-binary

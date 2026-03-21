@@ -109,10 +109,6 @@ players["Player"] = players["First Name"] + " " + players["Second Name"]
 # -- Filters ----------------------------------------------------------------
 col_name, col_team, col_pos, col_price = st.columns(4)
 
-with col_name:
-    player_names = sorted(players["Player"].unique().tolist())
-    selected_players = st.multiselect("Player Name", player_names, placeholder="Search...")
-
 with col_team:
     teams = ["All"] + sorted(players["Team"].unique().tolist())
     selected_team = st.selectbox("Team", teams)
@@ -123,12 +119,14 @@ with col_pos:
 
 filtered = players.copy()
 
-if selected_players:
-    filtered = filtered[filtered["Player"].isin(selected_players)]
 if selected_team != "All":
     filtered = filtered[filtered["Team"] == selected_team]
 if selected_position != "All":
     filtered = filtered[filtered["Position"] == selected_position]
+
+with col_name:
+    player_names = sorted(filtered["Player"].unique().tolist())
+    selected_players = st.multiselect("Player Name", player_names, placeholder="Search...")
 
 with col_price:
     min_price = float(filtered["Price"].min()) if not filtered.empty else 0.0
@@ -139,21 +137,15 @@ with col_price:
     else:
         st.slider("Price", min_price, max_price + 0.1, (min_price, max_price + 0.1), step=0.1, disabled=True)
 
-# -- Table ------------------------------------------------------------------
+# -- Table (visible only when players are selected) ------------------------
 TABLE_EXCLUDE = {"ID", "First Name", "Second Name", "xG90", "xA90", "xGI90", "xGC90", "DC90", "Saves90", "Goals90", "Assists90", "GC90", "CS90"}
 display_columns = ["Player"] + [c for c in COLUMNS if c not in TABLE_EXCLUDE]
 
-selection = st.dataframe(
-    filtered[display_columns],
-    use_container_width=True,
-    hide_index=True,
-    selection_mode="multi-row",
-    on_select="rerun",
-)
+all_selected = selected_players
 
-# Combine multiselect + table row clicks
-table_picked = filtered.iloc[selection.selection.rows]["Player"].tolist() if selection.selection.rows else []
-all_selected = list(set(selected_players + table_picked))
+if all_selected:
+    table_data = filtered[filtered["Player"].isin(all_selected)]
+    st.dataframe(table_data[display_columns], use_container_width=True, hide_index=True)
 
 # -- Spider chart --------------------------------------------------------------
 if all_selected:
