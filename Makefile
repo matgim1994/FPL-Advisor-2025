@@ -12,8 +12,8 @@ prod-up:
 prod-down:
 	docker compose --env-file config/prod/.env down
 
-streamlit:
-	export $(grep -v '^#' config/dev/.env | grep -v '^$' | xargs) && cd streamlit && streamlit run Home.py
+dev-streamlit:
+	export $DEV && cd streamlit && streamlit run Home.py
 
-predict:
-	export $(grep -v '^#' config/dev/.env | grep -v '^$' | xargs) && python -m prediction.src.predict
+dev-predict:
+	export $DEV && python -m prediction.src.predict

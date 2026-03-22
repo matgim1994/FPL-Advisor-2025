@@ -254,19 +254,24 @@ class DBHandler:
         for gw_id in gw_ids:
             api_result = _api_session.get(PERFORMANCE_GW_API+f'{gw_id}/live').json()
             api_result = api_result['elements']
+            not_played_yet = 0
             for element in api_result:
-                for stat in element['explain'][0]['stats']:
-                    stat['id'] = element['id']
-                    stat['fixture'] = element['explain'][0]['fixture']
-                try:
-                    explain = [PointsExplain.model_validate(stat) for stat in element['explain'][0]['stats']]
-                    records.extend(explain)
-                except Exception as e:
-                    self._logger.error(f"An error occured during points explain for {stat['id']} " +
-                                       f"in fixture {stat['fixture']} fields validation: {e}. Raising error.")
-                    raise e
+                if element['explain']:
+                    for stat in element['explain'][0]['stats']:
+                        stat['id'] = element['id']
+                        stat['fixture'] = element['explain'][0]['fixture']
+                    try:
+                        explain = [PointsExplain.model_validate(stat) for stat in element['explain'][0]['stats']]
+                        records.extend(explain)
+                    except Exception as e:
+                        self._logger.error(f"An error occured during points explain for {stat['id']} " +
+                                        f"in fixture {stat['fixture']} fields validation: {e}. Raising error.")
+                        raise e
+                else:
+                    not_played_yet += 1
 
-        self._logger.info(f'raw.points_explain: validated {len(records)} records across {len(gw_ids)} GW(s).')
+        self._logger.info(f'raw.points_explain: validated {len(records)} records across {len(gw_ids)} GW(s). ' +
+                          f'{not_played_yet} players did not play yet in GW {gw_id}.')
         self._upsert_raw_data(schema='raw', table_name='points_explain', records=records, columns=columns,
                               hash_columns=hash_columns, primary_keys=primary_keys, ingestion_time=ingestion_time)
 
