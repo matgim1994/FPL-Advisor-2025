@@ -15,5 +15,8 @@ prod-down:
 dev-streamlit:
 	export $DEV && cd streamlit && streamlit run Home.py
 
+dev-jupyter:
+	export $DEV && jupyter notebook
+
 dev-predict:
 	export $DEV && python -m prediction.src.predict
